@@ -1,26 +1,207 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0f;
+  --foreground: #e4e4e7;
+  --accent: #1e3a5f;
+  --accent-light: #2d5a8e;
+  --accent-dark: #152a45;
+  --accent-glow: #3b82f6;
+  --surface: #0f1219;
+  --surface-light: #1a1f2e;
+  --border: #1e2433;
+  --muted: #71717a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-glow: var(--accent-glow);
+  --color-surface: var(--surface);
+  --color-surface-light: var(--surface-light);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: var(--background);
+  background-image:
+    /* Primary glow — large orb at top center, biru terang → ungu gelap */
+    radial-gradient(ellipse 120% 70% at 50% -20%,
+      rgba(59, 130, 246, 0.22) 0%,
+      rgba(45, 90, 142, 0.28) 25%,
+      rgba(23, 21, 59, 0.45) 50%,
+      transparent 72%
+    ),
+    /* Secondary glow — accent kiri bawah */
+    radial-gradient(ellipse 70% 50% at -15% 80%,
+      rgba(23, 21, 59, 0.4) 0%,
+      rgba(30, 58, 95, 0.2) 40%,
+      transparent 65%
+    ),
+    /* Accent kanan atas */
+    radial-gradient(ellipse 55% 40% at 110% 20%,
+      rgba(23, 21, 59, 0.35) 0%,
+      rgba(59, 130, 246, 0.08) 45%,
+      transparent 65%
+    );
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  cursor: none;
+}
+
+/* Hide default cursor on interactive elements */
+a, button, [role="button"], input, textarea, select {
+  cursor: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-light);
+}
+
+/* Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Stagger animation delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-glow), var(--accent-light), #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Todesktop-style top glow line */
+.glow-line-top {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.4) 30%,
+    rgba(45, 90, 142, 0.7) 50%,
+    rgba(59, 130, 246, 0.4) 70%,
+    transparent 100%
+  );
+  z-index: 40;
+  pointer-events: none;
+}
+
+.glow-line-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 80%;
+  height: 80px;
+  background: radial-gradient(ellipse at 50% 0%,
+    rgba(59, 130, 246, 0.12) 0%,
+    rgba(23, 21, 59, 0.08) 50%,
+    transparent 100%
+  );
+  filter: blur(8px);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+}
+
+/* Hover card effect */
+.hover-card {
+  transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(30, 58, 95, 0.15);
+  border-color: var(--accent-light);
 }

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.todesktop.com)",
+      "Bash(curl -s \"https://www.todesktop.com/\")"
+    ]
+  }
+}
