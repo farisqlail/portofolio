@@ -17,6 +17,9 @@ const CustomCursor = dynamic(() => import("@/components/CustomCursor"), {
   ssr: false,
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://laildev.vercel.app/";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,12 +35,79 @@ export default function Home() {
     <>
       <Head>
         <title>Faris Rizqilail | Software Engineer & Founder of LailDev</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta
           name="description"
-          content="Faris Rizqilail - Software Engineer & Founder of LailDev. Building robust, scalable software solutions and crafting elegant digital experiences."
+          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev. Building robust, scalable software solutions and crafting elegant digital experiences."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="keywords"
+          content="Faris Rizqilail, farisqlail, LailDev, Software Engineer, Web Developer, Full Stack, Portfolio, Indonesia"
+        />
+        <meta name="author" content="Faris Rizqilail" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={SITE_URL} />
         <link rel="icon" href="/assets/icons/logo.png" type="image/png" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={SITE_URL} />
+        <meta property="og:site_name" content="Faris Rizqilail" />
+        <meta property="og:locale" content="en_US" />
+        <meta
+          property="og:title"
+          content="Faris Rizqilail | Software Engineer & Founder of LailDev"
+        />
+        <meta
+          property="og:description"
+          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev. Building robust, scalable software solutions and crafting elegant digital experiences."
+        />
+        <meta
+          property="og:image"
+          content={`${SITE_URL}/assets/images/faris-hero-2.png`}
+        />
+        <meta
+          property="og:image:alt"
+          content="Faris Rizqilail — Software Engineer"
+        />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Faris Rizqilail | Software Engineer & Founder of LailDev"
+        />
+        <meta
+          name="twitter:description"
+          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev."
+        />
+        <meta
+          name="twitter:image"
+          content={`${SITE_URL}/assets/images/faris-hero-2.png`}
+        />
+
+        {/* JSON-LD Person schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Faris Rizqilail",
+              alternateName: ["farisqlail", "LailDev"],
+              url: SITE_URL,
+              image: `${SITE_URL}/assets/images/faris-hero-2.png`,
+              jobTitle: "Software Engineer",
+              description:
+                "Software Engineer & Founder of LailDev, building robust software solutions and elegant digital experiences.",
+              worksFor: {
+                "@type": "Organization",
+                name: "LailDev",
+              },
+              sameAs: ["https://github.com/farisqlail"],
+            }),
+          }}
+        />
       </Head>
 
       <ScrollProgressBar />

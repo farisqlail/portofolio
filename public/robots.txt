@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://laildev.vercel.app/sitemap.xml
