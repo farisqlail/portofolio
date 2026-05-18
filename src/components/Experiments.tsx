@@ -1,35 +1,39 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Sparkles, Terminal, Brain, Boxes, ArrowUpRight } from "lucide-react";
+import { Brain, Sparkles, Globe, Gamepad2, ArrowUpRight } from "lucide-react";
 
 const experiments = [
   {
-    title: "Generative Art Engine",
+    title: "AI Code Review Assistant",
     description:
-      "A creative coding experiment using WebGL and GLSL shaders to generate procedural art in real-time.",
-    category: "Creative Coding",
-    icon: Sparkles,
-  },
-  {
-    title: "CLI Task Runner",
-    description:
-      "A Rust-based CLI tool for automating repetitive development tasks with parallel execution support.",
-    category: "Developer Tools",
-    icon: Terminal,
-  },
-  {
-    title: "Neural Style Transfer",
-    description:
-      "Experimenting with deep learning models to apply artistic styles to photographs in the browser.",
-    category: "Machine Learning",
+      "Fullstack AI tool that automatically analyzes code for bugs, security vulnerabilities, and best practices. React + Express frontend/backend proxying Llama 3.3 70B via Groq API with real-time streaming results.",
+    category: "AI / Code Tools",
     icon: Brain,
+    href: "https://github.com/farisqlail/review-code-ai",
   },
   {
-    title: "Micro-Frontend Architecture",
+    title: "Simple Wallet Web3",
     description:
-      "Exploring module federation and micro-frontend patterns for building scalable enterprise applications.",
-    category: "Architecture",
-    icon: Boxes,
+      "Web3 wallet app with Solidity smart contract backend. Handles cryptocurrency transactions and interactions with Ethereum-compatible networks via a JavaScript frontend.",
+    category: "Web3 / Blockchain",
+    icon: Globe,
+    href: "https://github.com/farisqlail/simple-wallet-web3",
+  },
+  {
+    title: "AI Agents Mini Startup",
+    description:
+      "Collaborative AI platform with four specialized agents (PM, CTO, Developer, QA) powered by Llama 3.3 70B. Input a project brief — agents autonomously design architecture, write code, and run QA. Export as docs or source code.",
+    category: "AI / Multi-Agent",
+    icon: Sparkles,
+    href: "https://github.com/farisqlail/ai-agents-mini-startup",
+  },
+  {
+    title: "Brongwood Game",
+    description:
+      "A cozy pixel RPG about healing, connection, and finding meaning in a quiet town. Built with TypeScript, focused on intimate narrative and community relationships.",
+    category: "Game Dev",
+    icon: Gamepad2,
+    href: "https://github.com/farisqlail/Brongwood-game",
   },
 ];
 
@@ -83,8 +87,11 @@ export default function Experiments() {
           animate={isInView ? "visible" : "hidden"}
         >
           {experiments.map((exp) => (
-            <motion.div
+            <motion.a
               key={exp.title}
+              href={exp.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-6 transition-all"
               variants={itemVariants}
               whileHover={{
@@ -117,22 +124,12 @@ export default function Experiments() {
                   {exp.description}
                 </p>
 
-                <motion.div
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent"
-                  initial={{ opacity: 0, x: -10 }}
-                  whileHover={{ x: 5 }}
-                  animate={{ opacity: 1, x: 0 }}
-                >
-                  <span className="opacity-0 transition-opacity group-hover:opacity-100">
-                    Explore
-                  </span>
-                  <ArrowUpRight
-                    size={14}
-                    className="opacity-0 transition-opacity group-hover:opacity-100"
-                  />
-                </motion.div>
+                <div className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
+                  <span>View on GitHub</span>
+                  <ArrowUpRight size={14} />
+                </div>
               </div>
-            </motion.div>
+            </motion.a>
           ))}
         </motion.div>
       </div>

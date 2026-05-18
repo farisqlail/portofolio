@@ -1,123 +1,151 @@
-import { useRef } from "react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { Mail, Send } from "lucide-react";
-import type { ComponentType, SVGProps } from "react";
-import { GithubIcon, LinkedinIcon, InstagramIcon } from "./icons";
-import AnimatedSection, { itemVariants, staggerContainer } from "./motion/AnimatedSection";
-import SplitHeading from "./motion/SplitHeading";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 
-type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
-
-const socialLinks: { label: string; href: string; icon: IconComponent }[] = [
-  {
-    label: "GitHub",
-    href: "https://github.com/farisqlail",
-    icon: GithubIcon,
-  },
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/faris-rizqilail-630329194/",
-    icon: LinkedinIcon,
-  },
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/laildev/",
-    icon: InstagramIcon,
-  },
-  {
-    label: "Email",
-    href: "mailto:farisqlail@gmail.com",
-    icon: Mail as unknown as IconComponent,
-  },
+const navLinks = [
+  { label: "HOME", href: "#home" },
+  { label: "ABOUT", href: "#about" },
+  { label: "SKILLS", href: "#skills" },
+  // { label: "PROJECTS", href: "#projects" },
+  { label: "EXPERIENCE", href: "#experience" },
+  { label: "CERTIFICATIONS", href: "#certifications" },
 ];
 
+const socialLinks = [
+  { label: "GITHUB", href: "https://github.com/farisqlail" },
+  { label: "LINKEDIN", href: "https://www.linkedin.com/in/faris-rizqilail-630329194/" },
+  { label: "INSTAGRAM", href: "https://www.instagram.com/laildev/" },
+  { label: "EMAIL", href: "mailto:farisqlail@gmail.com" },
+];
+
+const techStack = ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Supabase", "React Native", "Web3"];
+
 export default function Contact() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 95,
-    damping: 28,
-    mass: 0.4,
-  });
-  const bgY = useTransform(progress, [0, 1], [-30, 30]);
-
   return (
-    <AnimatedSection id="contact" className="relative overflow-hidden px-6 py-24" ref={ref}>
-      <motion.div
-        className="pointer-events-none absolute left-1/2 top-10 h-80 w-80 -translate-x-1/2 rounded-full bg-accent/10 blur-[90px]"
-        style={{ y: bgY }}
-      />
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          className="relative overflow-hidden rounded-3xl border border-border bg-surface p-12 text-center md:p-20"
-          variants={staggerContainer}
-        >
-          {/* Background decoration */}
-          <div className="pointer-events-none absolute inset-0">
-            <motion.div
-              className="absolute top-0 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-[80px]"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity }}
-            />
-          </div>
+    <section id="contact" className="relative overflow-hidden bg-background">
+      {/* 3-column main area */}
+      <div className="mx-auto max-w-7xl px-6 md:px-10 pt-16 md:pt-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 items-start">
 
-          <div className="relative">
-            <motion.h2
-              className="text-sm font-medium uppercase tracking-widest text-accent-light"
-              variants={itemVariants}
-            >
-              Contact
-            </motion.h2>
-            <SplitHeading
-              as="h3"
-              text="Let's Work Together"
-              className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-            />
-            <motion.p
-              className="mx-auto mt-4 max-w-lg text-muted"
-              variants={itemVariants}
-            >
-              Have a project in mind or just want to chat? Feel free to reach out.
-              I&apos;m always open to discussing new opportunities and ideas.
-            </motion.p>
-
-            <motion.a
-              href="mailto:farisqlail@gmail.com"
-              className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-accent px-8 text-sm font-medium text-white transition-all hover:bg-accent-dark hover:shadow-lg hover:shadow-accent/25"
-              variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Send size={16} />
-              Say Hello
-            </motion.a>
-
-            <motion.div
-              className="mt-10 flex items-center justify-center gap-4"
-              variants={staggerContainer}
-            >
-              {socialLinks.map((link) => (
+          {/* LEFT: Pages */}
+          <div>
+            <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
+              Pages
+            </p>
+            <nav className="flex flex-col gap-0.5">
+              {navLinks.map((link, i) => (
                 <motion.a
                   key={link.label}
                   href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted transition-all hover:border-accent hover:text-accent"
-                  aria-label={link.label}
-                  whileHover={{ scale: 1.15, y: -3 }}
-                  whileTap={{ scale: 0.9 }}
-                  variants={itemVariants}
+                  className="text-2xl font-black uppercase leading-snug tracking-tight text-foreground transition-colors hover:text-accent-glow"
+                  initial={{ opacity: 0, x: -16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.055 }}
                 >
-                  <link.icon size={20} />
+                  {link.label}
                 </motion.a>
               ))}
+              <motion.a
+                href="mailto:farisqlail@gmail.com"
+                className="mt-4 text-2xl font-black uppercase tracking-tight text-accent-glow transition-colors hover:text-accent-light"
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: navLinks.length * 0.055 }}
+              >
+                LAILDEV
+              </motion.a>
+            </nav>
+          </div>
+
+          {/* CENTER: Headline + Portrait */}
+          <div className="flex flex-col items-center text-center">
+            <motion.h2
+              className="relative z-10 text-5xl font-black uppercase leading-[0.88] tracking-tighter sm:text-6xl md:text-7xl"
+              initial={{ opacity: 0, y: 36 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <span className="block text-foreground">BRING</span>
+              <span className="block text-accent-glow">COFFEE</span>
+              <span className="block text-foreground">TO YOUR</span>
+              <span className="block text-accent-glow">DESK.</span>
+            </motion.h2>
+
+            <motion.div
+              className="relative z-0  w-56 overflow-hidden md:w-64"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              <Image
+                src="/assets/images/faris-hero-hover.png"
+                alt="Faris Rizqilail"
+                width={256}
+                height={384}
+                className="h-auto w-full object-cover"
+                priority={false}
+              />
             </motion.div>
           </div>
-        </motion.div>
+
+          {/* RIGHT: Follow On */}
+          <div className="md:text-right">
+            <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.28em] text-muted">
+              Follow On
+            </p>
+            <nav className="flex flex-col gap-0.5 md:items-end">
+              {socialLinks.map((link, i) => (
+                <motion.a
+                  key={link.label}
+                  href={link.href}
+                  target={link.href.startsWith("mailto") ? undefined : "_blank"}
+                  rel="noopener noreferrer"
+                  className="text-2xl font-black uppercase leading-snug tracking-tight text-foreground transition-colors hover:text-accent-glow"
+                  initial={{ opacity: 0, x: 16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.055 }}
+                >
+                  {link.label}
+                </motion.a>
+              ))}
+            </nav>
+          </div>
+        </div>
       </div>
-    </AnimatedSection>
+
+      {/* Tech stack logos band */}
+      <div className="mt-14 border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-5 md:px-10">
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
+            {techStack.map((tech, i) => (
+              <motion.span
+                key={tech}
+                className="text-xs font-bold uppercase tracking-[0.22em] text-muted/50"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.04 }}
+              >
+                {tech}
+              </motion.span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer bar */}
+      <div className="border-t border-border">
+        <div className="mx-auto max-w-7xl flex flex-col items-center justify-center gap-4 px-6 py-5 sm:flex-row md:px-10">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted">
+            &copy; {new Date().getFullYear()} Faris Rizqilail. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -9,7 +9,7 @@ const navLinks = [
   { label: "Projects", href: "#projects" },
   { label: "Experience", href: "#experience" },
   { label: "Certifications", href: "#certifications" },
-  // { label: "Experiments", href: "#experiments" },
+  { label: "Experiments", href: "#experiments" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -48,7 +48,7 @@ export default function Navbar() {
             className="rounded-md"
           />
           <span className="text-xl font-bold tracking-tight gradient-text">
-            Faris Rizqilail
+            LailDev
           </span>
         </motion.a>
 

@@ -7,11 +7,11 @@ import ScrollProgressBar from "@/components/ScrollProgressBar";
 import TechMarquee from "@/components/TechMarquee";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
-import Projects from "@/components/Projects";
+// import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Certifications from "@/components/Certifications";
 import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+import Experiments from "@/components/Experiments";
 
 const CustomCursor = dynamic(() => import("@/components/CustomCursor"), {
   ssr: false,
@@ -125,13 +125,12 @@ export default function Home() {
           <TechMarquee />
           <About />
           <Skills />
-          <Projects />
+          {/* <Projects /> */}
           <Experience />
           <Certifications />
-          {/* <Experiments /> */}
+          <Experiments />
           <Contact />
         </main>
-        <Footer />
       </motion.div>
     </>
   );
