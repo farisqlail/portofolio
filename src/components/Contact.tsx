@@ -1,8 +1,10 @@
-import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Mail, Send } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "./icons";
+import AnimatedSection, { itemVariants, staggerContainer } from "./motion/AnimatedSection";
+import SplitHeading from "./motion/SplitHeading";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
 
@@ -30,17 +32,28 @@ const socialLinks: { label: string; href: string; icon: IconComponent }[] = [
 ];
 
 export default function Contact() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 95,
+    damping: 28,
+    mass: 0.4,
+  });
+  const bgY = useTransform(progress, [0, 1], [-30, 30]);
 
   return (
-    <section id="contact" className="px-6 py-24" ref={ref}>
+    <AnimatedSection id="contact" className="relative overflow-hidden px-6 py-24" ref={ref}>
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-10 h-80 w-80 -translate-x-1/2 rounded-full bg-accent/10 blur-[90px]"
+        style={{ y: bgY }}
+      />
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="relative overflow-hidden rounded-3xl border border-border bg-surface p-12 text-center md:p-20"
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7 }}
+          variants={staggerContainer}
         >
           {/* Background decoration */}
           <div className="pointer-events-none absolute inset-0">
@@ -54,25 +67,18 @@ export default function Contact() {
           <div className="relative">
             <motion.h2
               className="text-sm font-medium uppercase tracking-widest text-accent-light"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2 }}
+              variants={itemVariants}
             >
               Contact
             </motion.h2>
-            <motion.h3
+            <SplitHeading
+              as="h3"
+              text="Let's Work Together"
               className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.3 }}
-            >
-              Let&apos;s Work Together
-            </motion.h3>
+            />
             <motion.p
               className="mx-auto mt-4 max-w-lg text-muted"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.4 }}
+              variants={itemVariants}
             >
               Have a project in mind or just want to chat? Feel free to reach out.
               I&apos;m always open to discussing new opportunities and ideas.
@@ -81,9 +87,7 @@ export default function Contact() {
             <motion.a
               href="mailto:farisqlail@gmail.com"
               className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-accent px-8 text-sm font-medium text-white transition-all hover:bg-accent-dark hover:shadow-lg hover:shadow-accent/25"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.5 }}
+              variants={itemVariants}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -93,11 +97,9 @@ export default function Contact() {
 
             <motion.div
               className="mt-10 flex items-center justify-center gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.6 }}
+              variants={staggerContainer}
             >
-              {socialLinks.map((link, i) => (
+              {socialLinks.map((link) => (
                 <motion.a
                   key={link.label}
                   href={link.href}
@@ -107,9 +109,7 @@ export default function Contact() {
                   aria-label={link.label}
                   whileHover={{ scale: 1.15, y: -3 }}
                   whileTap={{ scale: 0.9 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 0.7 + i * 0.1 }}
+                  variants={itemVariants}
                 >
                   <link.icon size={20} />
                 </motion.a>
@@ -118,6 +118,6 @@ export default function Contact() {
           </div>
         </motion.div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }

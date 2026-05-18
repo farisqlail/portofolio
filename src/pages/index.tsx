@@ -2,13 +2,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
+import HeroSection from "@/components/HeroSection";
+import ScrollProgressBar from "@/components/ScrollProgressBar";
+import TechMarquee from "@/components/TechMarquee";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
-import Experiments from "@/components/Experiments";
 import Certifications from "@/components/Certifications";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
@@ -40,6 +40,7 @@ export default function Home() {
         <link rel="icon" href="/assets/icons/logo.png" type="image/png" />
       </Head>
 
+      <ScrollProgressBar />
       <CustomCursor />
       <div className="glow-line-top" />
 
@@ -49,9 +50,9 @@ export default function Home() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <Navbar />
         <main>
-          <Hero />
+          <HeroSection />
+          <TechMarquee />
           <About />
           <Skills />
           <Projects />

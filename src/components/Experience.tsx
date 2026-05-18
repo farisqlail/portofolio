@@ -1,6 +1,7 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Building2, Calendar } from "lucide-react";
+import AnimatedSection, { itemVariants, staggerContainer } from "./motion/AnimatedSection";
+import SplitHeading from "./motion/SplitHeading";
 
 const experiences = [
   {
@@ -96,24 +97,21 @@ const experiences = [
 ];
 
 export default function Experience() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
   return (
-    <section id="experience" className="px-6 py-24" ref={ref}>
+    <AnimatedSection id="experience" className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          variants={itemVariants}
         >
           <h2 className="text-sm font-medium uppercase tracking-widest text-accent-light">
             Career
           </h2>
-          <h3 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            Work Experience
-          </h3>
+          <SplitHeading
+            as="h3"
+            text="Work Experience"
+            className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+          />
           <p className="mx-auto mt-4 max-w-2xl text-muted">
             My professional journey from intern to product lead — building digital solutions across industries.
           </p>
@@ -124,25 +122,31 @@ export default function Experience() {
           <motion.div
             className="absolute left-8 top-0 hidden h-full w-px bg-gradient-to-b from-accent via-accent-light/50 to-transparent md:block"
             initial={{ scaleY: 0 }}
-            animate={isInView ? { scaleY: 1 } : {}}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 1.5, delay: 0.3 }}
             style={{ transformOrigin: "top" }}
           />
 
-          <div className="space-y-6">
+          <motion.div
+            className="space-y-6"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+          >
             {experiences.map((exp, index) => (
               <motion.div
                 key={exp.role + exp.company + exp.period}
                 className="relative flex gap-8"
-                initial={{ opacity: 0, x: -30 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.15 + index * 0.1 }}
+                variants={itemVariants}
               >
                 {/* Timeline dot */}
                 <motion.div
                   className="relative z-10 hidden md:block"
                   initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : {}}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
                   transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
                 >
                   <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent bg-background">
@@ -187,9 +191,9 @@ export default function Experience() {
                 </motion.div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }

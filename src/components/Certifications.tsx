@@ -1,6 +1,7 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Award, FileBadge, Trophy, ExternalLink, Calendar } from "lucide-react";
+import AnimatedSection, { itemVariants, staggerContainer } from "./motion/AnimatedSection";
+import SplitHeading from "./motion/SplitHeading";
 
 const certifications = [
   {
@@ -40,42 +41,22 @@ const achievements = [
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
-};
-
 export default function Certifications() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
   return (
-    <section id="certifications" className="px-6 py-24" ref={ref}>
+    <AnimatedSection id="certifications" className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          variants={itemVariants}
         >
           <h2 className="text-sm font-medium uppercase tracking-widest text-accent-light">
             Credentials
           </h2>
-          <h3 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            Licenses & Certifications
-          </h3>
+          <SplitHeading
+            as="h3"
+            text="Licenses & Certifications"
+            className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+          />
           <p className="mx-auto mt-4 max-w-2xl text-muted">
             Professional certifications and competition achievements that validate my expertise.
           </p>
@@ -84,9 +65,7 @@ export default function Certifications() {
         {/* Certifications Section */}
         <motion.div
           className="mt-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          variants={itemVariants}
         >
           <div className="mb-6 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
@@ -97,9 +76,7 @@ export default function Certifications() {
 
           <motion.div
             className="grid gap-4 md:grid-cols-2"
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
+            variants={staggerContainer}
           >
             {certifications.map((cert) => (
               <motion.div
@@ -150,9 +127,7 @@ export default function Certifications() {
         {/* Achievements Section */}
         <motion.div
           className="mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          variants={itemVariants}
         >
           <div className="mb-6 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
@@ -163,9 +138,7 @@ export default function Certifications() {
 
           <motion.div
             className="grid gap-4 md:grid-cols-2"
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
+            variants={staggerContainer}
           >
             {achievements.map((achievement, index) => (
               <motion.div
@@ -215,6 +188,6 @@ export default function Certifications() {
           </motion.div>
         </motion.div>
       </div>
-    </section>
+    </AnimatedSection>
   );
 }

@@ -5,11 +5,13 @@ import type { Mesh } from "three";
 
 function CameraZoom({ progress }: { progress: number }) {
   const { camera } = useThree();
+  const cameraRef = useRef(camera);
 
   useFrame(() => {
     // Move camera forward as scroll progresses (z: 5 → 1.5)
     const targetZ = 5 - progress * 3.5;
-    camera.position.z += (targetZ - camera.position.z) * 0.08;
+    const currentCamera = cameraRef.current;
+    currentCamera.position.z += (targetZ - currentCamera.position.z) * 0.08;
   });
 
   return null;

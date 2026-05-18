@@ -1,41 +1,52 @@
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Code2, Briefcase, Lightbulb, Rocket } from "lucide-react";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const fadeLeft = {
-  hidden: { opacity: 0, x: -40 },
-  visible: { opacity: 1, x: 0 },
-};
-
-const fadeRight = {
-  hidden: { opacity: 0, x: 40 },
-  visible: { opacity: 1, x: 0 },
-};
+import AnimatedSection, { itemVariants } from "./motion/AnimatedSection";
+import SplitHeading from "./motion/SplitHeading";
 
 export default function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start 45%"],
+  });
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 95,
+    damping: 28,
+    mass: 0.4,
+  });
+  const sectionY = useTransform(progress, [0, 1], [72, 0]);
+  const sectionOpacity = useTransform(progress, [0, 0.45, 1], [0, 0.78, 1]);
+  const visualY = useTransform(progress, [0, 1], [56, 0]);
+  const contentY = useTransform(progress, [0, 1], [82, 0]);
+  const glowOpacity = useTransform(progress, [0, 1], [0.12, 0.42]);
+  const bgY = useTransform(progress, [0, 1], [-30, 30]);
+
   return (
-    <section id="about" className="px-6 py-24">
+    <AnimatedSection
+      ref={sectionRef}
+      id="about"
+      className="relative -mt-20 overflow-hidden px-6 pb-24 pt-36"
+      style={{ y: sectionY, opacity: sectionOpacity }}
+    >
       <motion.div
-        className="mx-auto max-w-6xl"
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#03060b] via-background/88 to-transparent"
+        style={{ opacity: glowOpacity, y: bgY }}
+      />
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-20 h-72 w-72 -translate-x-1/2 rounded-full bg-accent-glow/10 blur-[88px]"
+        style={{ opacity: glowOpacity, y: bgY }}
+      />
+      <motion.div
+        className="relative mx-auto max-w-6xl"
+        variants={itemVariants}
       >
         <div className="grid gap-12 md:grid-cols-2 md:items-center">
           {/* Left - Visual */}
           <motion.div
             className="relative"
-            variants={fadeLeft}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+            variants={itemVariants}
+            style={{ y: visualY }}
           >
             <div className="relative aspect-square max-w-md overflow-hidden rounded-2xl border border-border bg-surface">
               <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-blue-500/20" />
@@ -74,15 +85,14 @@ export default function About() {
 
           {/* Right - Content */}
           <motion.div
-            variants={fadeRight}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, delay: 0.25, ease: "easeOut" }}
+            variants={itemVariants}
+            style={{ y: contentY }}
           >
-            <h2 className="text-sm font-medium uppercase tracking-widest text-accent-light">
-              About Me
-            </h2>
+            <SplitHeading
+              as="h2"
+              text="About Me"
+              className="text-sm font-medium uppercase tracking-widest text-accent-light"
+            />
             <h3 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
               Crafting Digital Solutions<br />
               <span className="text-muted">with Purpose</span>
@@ -126,6 +136,6 @@ export default function About() {
           </motion.div>
         </div>
       </motion.div>
-    </section>
+    </AnimatedSection>
   );
 }
