@@ -1,21 +1,15 @@
+import { useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Head from "next/head";
-import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
+import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import ScrollProgressBar from "@/components/ScrollProgressBar";
-import TechMarquee from "@/components/TechMarquee";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
-// import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Certifications from "@/components/Certifications";
-import Contact from "@/components/Contact";
 import Experiments from "@/components/Experiments";
-
-const CustomCursor = dynamic(() => import("@/components/CustomCursor"), {
-  ssr: false,
-});
+import Contact from "@/components/Contact";
+import DeckStage, { DeckCardItem } from "@/components/motion/DeckStage";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://laildev.vercel.app/";
@@ -31,18 +25,79 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const cards: DeckCardItem[] = [
+    {
+      id: "hero",
+      tag: "Overview",
+      title: "Profile & Engineering Focus",
+      label: "Overview",
+      num: "01",
+      component: <HeroSection />,
+    },
+    {
+      id: "about",
+      tag: "Philosophy",
+      title: "Architecture & Methodology",
+      label: "Philosophy",
+      num: "02",
+      component: <About />,
+    },
+    {
+      id: "skills",
+      tag: "Capabilities",
+      title: "Production Tech Stack",
+      label: "Capabilities",
+      num: "03",
+      component: <Skills />,
+    },
+    {
+      id: "experience",
+      tag: "Experience",
+      title: "Production Career Timeline",
+      label: "Experience",
+      num: "04",
+      component: <Experience />,
+    },
+    {
+      id: "certifications",
+      tag: "Honors",
+      title: "Competition Awards & Credentials",
+      label: "Honors",
+      num: "05",
+      component: <Certifications />,
+    },
+    {
+      id: "experiments",
+      tag: "Lab",
+      title: "Open-Source Prototypes & Systems",
+      label: "Lab",
+      num: "06",
+      component: <Experiments />,
+    },
+    {
+      id: "contact",
+      tag: "Contact",
+      title: "Direct Channels & Discussion",
+      label: "Contact",
+      num: "07",
+      component: <Contact onSelectCard={setActiveIndex} />,
+    },
+  ];
+
   return (
     <>
       <Head>
-        <title>Faris Rizqilail | Software Engineer & Founder of LailDev</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Faris Rizqilail · Software Engineer & Founder @LailDev</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta
           name="description"
-          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev. Building robust, scalable software solutions and crafting elegant digital experiences."
+          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev. 7+ years shipping production web, mobile, and cloud software."
         />
         <meta
           name="keywords"
-          content="Faris Rizqilail, farisqlail, LailDev, Software Engineer, Web Developer, Full Stack, Portfolio, Indonesia"
+          content="Faris Rizqilail, farisqlail, LailDev, Software Engineer, Full Stack, Product Lead, Next.js, React, TypeScript, Laravel"
         />
         <meta name="author" content="Faris Rizqilail" />
         <meta name="robots" content="index, follow" />
@@ -53,85 +108,34 @@ export default function Home() {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={SITE_URL} />
         <meta property="og:site_name" content="Faris Rizqilail" />
-        <meta property="og:locale" content="en_US" />
-        <meta
-          property="og:title"
-          content="Faris Rizqilail | Software Engineer & Founder of LailDev"
-        />
+        <meta property="og:title" content="Faris Rizqilail · Software Engineer & Founder @LailDev" />
         <meta
           property="og:description"
-          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev. Building robust, scalable software solutions and crafting elegant digital experiences."
+          content="7+ years shipping production web, mobile, and cloud software across enterprise, government, and startup ventures."
         />
-        <meta
-          property="og:image"
-          content={`${SITE_URL}/assets/images/faris-hero-2.png`}
-        />
-        <meta
-          property="og:image:alt"
-          content="Faris Rizqilail — Software Engineer"
-        />
+        <meta property="og:image" content={`${SITE_URL}/assets/images/faris-hero-2.png`} />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="Faris Rizqilail | Software Engineer & Founder of LailDev"
-        />
+        <meta name="twitter:title" content="Faris Rizqilail · Software Engineer & Founder @LailDev" />
         <meta
           name="twitter:description"
-          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev."
+          content="7+ years shipping production web, mobile, and cloud software."
         />
-        <meta
-          name="twitter:image"
-          content={`${SITE_URL}/assets/images/faris-hero-2.png`}
-        />
-
-        {/* JSON-LD Person schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              name: "Faris Rizqilail",
-              alternateName: ["farisqlail", "LailDev"],
-              url: SITE_URL,
-              image: `${SITE_URL}/assets/images/faris-hero-2.png`,
-              jobTitle: "Software Engineer",
-              description:
-                "Software Engineer & Founder of LailDev, building robust software solutions and elegant digital experiences.",
-              worksFor: {
-                "@type": "Organization",
-                name: "LailDev",
-              },
-              sameAs: ["https://github.com/farisqlail"],
-            }),
-          }}
-        />
+        <meta name="twitter:image" content={`${SITE_URL}/assets/images/faris-hero-2.png`} />
       </Head>
 
-      <ScrollProgressBar />
-      <CustomCursor />
-      <div className="glow-line-top" />
+      <div className={`${geistSans.variable} ${geistMono.variable} fixed inset-0 h-screen w-screen overflow-hidden bg-black text-foreground font-sans selection:bg-white selection:text-black`}>
+        {/* Fixed Header Bar */}
+        <Navbar activeIndex={activeIndex} onSelectCard={setActiveIndex} />
 
-      <motion.div
-        className={`${geistSans.variable} ${geistMono.variable} font-sans`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <main>
-          <HeroSection />
-          <TechMarquee />
-          <About />
-          <Skills />
-          {/* <Projects /> */}
-          <Experience />
-          <Certifications />
-          <Experiments />
-          <Contact />
-        </main>
-      </motion.div>
+        {/* Fixed-Viewport Virtual Scroll Card Engine with Integrated Background */}
+        <DeckStage
+          cards={cards}
+          activeIndex={activeIndex}
+          onCardChange={setActiveIndex}
+        />
+      </div>
     </>
   );
 }

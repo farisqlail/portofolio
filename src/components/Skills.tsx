@@ -1,195 +1,168 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import {
-  Code2,
-  Layout,
-  Server,
-  Database,
-  Wrench,
-  Users,
-  Brain,
-} from "lucide-react";
+import { Layout, Server, Database, Smartphone, GitBranch, Brain } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-/*
-  Folder shape: tab raised at top-left (80px wide, 20px tall),
-  diagonal transition at 96px, then body starts.
-  polygon: top-left tab → diagonal → full-width body → box close
-*/
-const FOLDER =
-  "polygon(0 0, 80px 0, 96px 20px, 100% 20px, 100% 100%, 0 100%)";
-
-interface SkillCat {
+interface SkillModule {
+  tag: string;
   title: string;
-  label: string;
   icon: LucideIcon;
+  color: string;
   skills: string[];
 }
 
-const skillCategories: SkillCat[] = [
+const skillModules: SkillModule[] = [
   {
-    title: "Frontend",
-    label: "Development",
+    tag: "01 Frontend",
+    title: "Frontend Architecture",
     icon: Layout,
+    color: "#C7B8F5",
     skills: [
       "React.js",
-      "Next.js",
-      "Vue.js",
-      "Nuxt.js",
+      "Next.js 16",
       "TypeScript",
-      "JavaScript",
-      "HTML",
-      "PWAs",
-      "Responsive Design",
+      "Vue.js / Nuxt",
+      "Tailwind CSS",
+      "JavaScript (ES6+)",
+      "HTML5 / CSS3",
+      "PWAs & Responsive",
     ],
   },
   {
-    title: "Backend",
-    label: "APIs",
+    tag: "02 Backend",
+    title: "Backend & Microservices",
     icon: Server,
+    color: "#F3B5D2",
     skills: [
       "PHP",
-      "Laravel",
+      "Laravel Framework",
+      "Node.js & Express",
       "CodeIgniter",
-      "REST APIs",
+      "RESTful APIs",
       "GraphQL",
-      "JWT",
-      "OAuth",
+      "JWT & OAuth2",
+      "Microservices",
     ],
   },
   {
-    title: "Database",
-    label: "Storage",
+    tag: "03 Database",
+    title: "Data & Storage",
     icon: Database,
-    skills: ["MySQL", "MongoDB", "PostgreSQL", "Oracle"],
-  },
-  {
-    title: "Mobile",
-    label: "Dev",
-    icon: Code2,
-    skills: ["React Native", "Flutter"],
-  },
-  {
-    title: "Version Ctrl",
-    label: "DevOps",
-    icon: Wrench,
-    skills: ["Git", "GitHub", "GitLab", "Docker"],
-  },
-  {
-    title: "Soft Skills",
-    label: "Management",
-    icon: Users,
+    color: "#F6D1AC",
     skills: [
-      "Communication",
-      "Coaching",
-      "Project Management",
-      "Analytical Skills",
+      "PostgreSQL",
+      "MySQL",
+      "MongoDB",
+      "Oracle DB",
+      "Supabase",
+      "Redis Caching",
+      "Schema Design",
     ],
   },
   {
-    title: "Architecture",
-    label: "SDLC",
+    tag: "04 Mobile",
+    title: "Mobile Development",
+    icon: Smartphone,
+    color: "#A7EADC",
+    skills: [
+      "React Native",
+      "Flutter",
+      "iOS Deployment",
+      "Android SDK",
+      "Offline-First",
+      "Push Notifications",
+    ],
+  },
+  {
+    tag: "05 DevOps",
+    title: "DevOps & CI/CD",
+    icon: GitBranch,
+    color: "#AFCDF6",
+    skills: [
+      "Git & GitHub",
+      "GitLab CI/CD",
+      "Docker",
+      "Linux Server Config",
+      "Vercel Deployment",
+      "Nginx",
+    ],
+  },
+  {
+    tag: "06 Leadership",
+    title: "Product & SDLC",
     icon: Brain,
-    skills: ["OOP", "SDLC", "Web Applications", "Project Risk", "Software Dev"],
+    color: "#C7B8F5",
+    skills: [
+      "Agile & Scrum",
+      "Product Management",
+      "Technical Roadmapping",
+      "Code Review",
+      "Risk Mitigation",
+      "System Architecture",
+    ],
   },
 ];
 
-function SkillCard({ cat, index }: { cat: SkillCat; index: number }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.06, duration: 0.45 }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-    >
-      {/*
-        Outer: clip-path=FOLDER + animates background = border color.
-        Inner: margin 1.5px reveals 1.5px gap = full border along all
-        edges including tab diagonal.
-      */}
-      <motion.div
-        style={{ clipPath: FOLDER }}
-        animate={{
-          background: hovered ? "var(--accent-glow)" : "var(--border)",
-        }}
-        transition={{ duration: 0.18 }}
-      >
-        {/* Inner card — pt-8 pushes content below the 20px tab clip area */}
-        <div
-          className="relative flex flex-col bg-surface px-5 pb-5 pt-8"
-          style={{ margin: "1.5px" }}
-        >
-          {/* Category label sits in the tab area (absolute, above clip boundary) */}
-          <span className="absolute left-3 top-1.5 text-[9px] font-bold uppercase tracking-widest text-accent-glow opacity-80">
-            {cat.label}
-          </span>
-
-          {/* Icon + title */}
-          <div className="mb-4 flex items-center gap-3">
-            <motion.div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-light"
-              animate={{
-                borderColor: hovered ? "var(--accent-glow)" : "var(--border)",
-              }}
-              transition={{ duration: 0.18 }}
-            >
-              <cat.icon
-                size={18}
-                className="text-accent-glow"
-                strokeWidth={1.5}
-              />
-            </motion.div>
-            <p className="text-sm font-bold text-foreground">{cat.title}</p>
-          </div>
-
-          {/* All skills — always visible, card height = content height = masonry */}
-          <div className="flex flex-wrap gap-1.5">
-            {cat.skills.map((skill) => (
-              <motion.span
-                key={skill}
-                className="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-medium text-muted transition-colors"
-                animate={{
-                  borderColor: hovered ? "var(--accent-glow)" : "var(--border)",
-                  color: hovered ? "var(--foreground)" : "var(--muted)",
-                }}
-                transition={{ duration: 0.15 }}
-              >
-                {skill}
-              </motion.span>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 export default function Skills() {
   return (
-    <section id="skills" className="px-6 py-24">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-14 text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-accent-light">
-            Skills &amp; Technologies
-          </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            My Tech Stack
-          </h2>
-        </div>
-
-        {/* Pinterest masonry via CSS columns — each card height = content → auto masonry */}
-        <div className="columns-2 gap-3 sm:columns-3 lg:columns-4 [column-gap:12px]">
-          {skillCategories.map((cat, i) => (
-            <div key={cat.title} className="mb-3 break-inside-avoid">
-              <SkillCard cat={cat} index={i} />
-            </div>
-          ))}
-        </div>
+    <div className="flex flex-col justify-between min-h-full gap-5 sm:gap-6">
+      {/* Header */}
+      <div className="border-b border-white/10 pb-3 sm:pb-4 shrink-0">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
+          Full-stack engineering &amp; <span className="gradient-pastel-text">cloud toolkit.</span>
+        </h2>
+        <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+          Production-tested technologies applied across high-scale applications, mobile clients, and distributed backends.
+        </p>
       </div>
-    </section>
+
+      {/* Modular Matrix Grid */}
+      <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-black/60 overflow-hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x lg:divide-x divide-white/10 flex-1">
+        {skillModules.map((mod, index) => {
+          const Icon = mod.icon;
+
+          return (
+            <div
+              key={mod.title}
+              className={`p-4 sm:p-5 lg:p-6 transition-all border-b border-white/10 ${
+                index >= 3 ? "lg:border-b-0" : ""
+              } ${
+                index % 2 === 1 ? "sm:border-r-0 lg:border-r" : ""
+              } hover:bg-white/[0.02] flex flex-col justify-between`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className="font-mono text-[10px] sm:text-[11px] font-semibold text-zinc-500">
+                    {mod.tag}
+                  </span>
+                  <div className="flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg border border-white/10 bg-zinc-900">
+                    <Icon size={13} style={{ color: mod.color }} />
+                  </div>
+                </div>
+
+                <h3 className="text-xs sm:text-sm font-bold text-white mb-2 sm:mb-2.5 tracking-tight">
+                  {mod.title}
+                </h3>
+
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                  {mod.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="rounded-full border border-white/10 bg-zinc-900/80 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-mono text-zinc-300 transition-colors hover:text-white"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer info bar */}
+      <div className="rounded-lg sm:rounded-xl border border-white/10 bg-zinc-950 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between font-mono text-xs text-zinc-400 shrink-0">
+        <span className="text-[10px] sm:text-xs">[ 6 Domains · 40+ Core Skills ]</span>
+        <span className="text-white font-medium text-[10px] sm:text-xs">Production Ready</span>
+      </div>
+    </div>
   );
 }

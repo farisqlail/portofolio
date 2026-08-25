@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:www.todesktop.com)",
       "Bash(curl -s \"https://www.todesktop.com/\")",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npm install *)"
     ]
   }
 }

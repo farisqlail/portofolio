@@ -1,34 +1,44 @@
-import { motion } from "framer-motion";
-import { Building2, Calendar } from "lucide-react";
-import AnimatedSection, { itemVariants, staggerContainer } from "./motion/AnimatedSection";
-import SplitHeading from "./motion/SplitHeading";
+import { Calendar } from "lucide-react";
 
-const experiences = [
+interface ExperienceItem {
+  role: string;
+  company: string;
+  type: string;
+  period: string;
+  status: "ACTIVE" | "PRODUCTION" | "COMPLETED";
+  description: string;
+  technologies: string[];
+}
+
+const experiences: ExperienceItem[] = [
   {
     role: "Mobile Developer",
     company: "KirimFresh.id",
     type: "Part-time",
     period: "Sep 2025 - Present",
+    status: "ACTIVE",
     description:
-      "Developing and maintaining mobile applications for KirimFresh.id platform, focusing on user experience and performance optimization.",
-    technologies: ["React Native", "Mobile Development", "iOS", "Android"],
+      "Developing and maintaining mobile applications for KirimFresh.id logistics platform, focusing on user experience, real-time tracking, and performance optimization.",
+    technologies: ["React Native", "iOS", "Android", "REST APIs"],
   },
   {
     role: "Product Lead",
     company: "InterActive Technologies Corp",
     type: "Full-time · On-site",
     period: "Apr 2025 - Present",
+    status: "ACTIVE",
     description:
-      "Leading product development strategy, managing cross-functional teams, and driving agile development processes to deliver scalable software solutions.",
-    technologies: ["Software Development", "Agile", "Product Management", "Leadership"],
+      "Leading product engineering strategy, managing cross-functional engineering teams, and driving agile development processes to ship enterprise software solutions.",
+    technologies: ["Product Leadership", "Agile/Scrum", "System Architecture"],
   },
   {
     role: "Frontend Web Developer",
     company: "InterActive Technologies Corp",
     type: "Full-time · On-site",
     period: "Nov 2023 - Sep 2025",
+    status: "PRODUCTION",
     description:
-      "Developing and maintaining frontend web applications, implementing modern UI/UX designs, and collaborating with backend teams to deliver seamless user experiences.",
+      "Engineered and maintained high-traffic web applications, implemented pixel-perfect UI/UX designs, and collaborated closely with backend engineers for seamless API integration.",
     technologies: ["React", "TypeScript", "Next.js", "Tailwind CSS"],
   },
   {
@@ -36,17 +46,19 @@ const experiences = [
     company: "GoCement",
     type: "Full-time",
     period: "Dec 2022 - Sep 2023",
+    status: "COMPLETED",
     description:
-      "Built and maintained responsive web interfaces for the GoCement platform, contributing to the company's digital transformation in the construction industry.",
-    technologies: ["React", "JavaScript", "CSS", "REST APIs"],
+      "Built responsive web interfaces for GoCement construction ecommerce platform, contributing to digital transformation in industrial supply chains.",
+    technologies: ["React", "JavaScript", "CSS3", "REST APIs"],
   },
   {
     role: "Web Developer",
     company: "PT Sinergi Informatika Semen Indonesia (SISI)",
     type: "Freelance",
     period: "Sep 2022 - Nov 2022",
+    status: "COMPLETED",
     description:
-      "Delivered web development solutions for enterprise-level applications within the Semen Indonesia group.",
+      "Delivered custom web application solutions for enterprise-scale internal operations within the Semen Indonesia group.",
     technologies: ["PHP", "Laravel", "MySQL", "JavaScript"],
   },
   {
@@ -54,26 +66,29 @@ const experiences = [
     company: "Digital Amoeba by Telkom Indonesia",
     type: "Internship",
     period: "Feb 2022 - Jul 2022",
+    status: "COMPLETED",
     description:
-      "Developing ideabox applications with microservices architecture and the CodeIgniter framework at Telkom Indonesia's innovation hub.",
+      "Developed Ideabox innovation platforms with microservices architecture and CodeIgniter framework at Telkom Indonesia's corporate innovation incubator.",
     technologies: ["CodeIgniter", "Microservices", "PHP", "MySQL"],
   },
   {
     role: "Chief Executive Officer",
     company: "Linux User Group Stikom Surabaya",
-    type: "Organization",
+    type: "Community Leadership",
     period: "Feb 2021 - Jan 2022",
+    status: "COMPLETED",
     description:
-      "Led the Linux User Group community, organizing tech events, workshops, and managing team operations for web development and open-source initiatives.",
-    technologies: ["Leadership", "Laravel", "Responsive Web Design", "Linux"],
+      "Led Linux community initiatives, organized regional tech events & hackathons, and managed engineering teams for open-source software development.",
+    technologies: ["Leadership", "Laravel", "Linux SysAdmin"],
   },
   {
     role: "Backend Developer",
-    company: "Ministry of Communication and Information Technology (Kominfo RI)",
-    type: "Freelance",
+    company: "Ministry of Communication & Information Technology (Kominfo RI)",
+    type: "Freelance / Public Sector",
     period: "Apr 2021 - Jul 2021",
+    status: "COMPLETED",
     description:
-      "Contributed to government digital infrastructure projects, developing backend systems for national-level applications.",
+      "Engineered backend digital infrastructure systems and secure REST APIs for national-level government public services.",
     technologies: ["PHP", "Laravel", "REST APIs", "PostgreSQL"],
   },
   {
@@ -81,8 +96,9 @@ const experiences = [
     company: "Linux User Group Stikom Surabaya",
     type: "Internship",
     period: "Nov 2019 - Jan 2021",
+    status: "COMPLETED",
     description:
-      "Developed frontend interfaces for community projects, learning modern web development practices and contributing to open-source initiatives.",
+      "Created frontend user interfaces for open-source community platforms and web tools.",
     technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "Git"],
   },
   {
@@ -90,110 +106,97 @@ const experiences = [
     company: "Dinas Komunikasi dan Informatika Surabaya",
     type: "Internship",
     period: "Feb 2018 - Apr 2018",
+    status: "COMPLETED",
     description:
-      "Created websites using PHP, AJAX, and Laravel framework for government communication and information services.",
+      "Built communication and public information web portals using PHP, AJAX, and Laravel framework for Surabaya city government.",
     technologies: ["PHP", "Laravel", "AJAX", "MySQL"],
   },
 ];
 
 export default function Experience() {
   return (
-    <AnimatedSection id="experience" className="px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          className="text-center"
-          variants={itemVariants}
-        >
-          <h2 className="text-sm font-medium uppercase tracking-widest text-accent-light">
-            Career
-          </h2>
-          <SplitHeading
-            as="h3"
-            text="Work Experience"
-            className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-          />
-          <p className="mx-auto mt-4 max-w-2xl text-muted">
-            My professional journey from intern to product lead — building digital solutions across industries.
-          </p>
-        </motion.div>
-
-        <div className="relative mt-16">
-          {/* Timeline line */}
-          <motion.div
-            className="absolute left-8 top-0 hidden h-full w-px bg-gradient-to-b from-accent via-accent-light/50 to-transparent md:block"
-            initial={{ scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 1.5, delay: 0.3 }}
-            style={{ transformOrigin: "top" }}
-          />
-
-          <motion.div
-            className="space-y-6"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-          >
-            {experiences.map((exp, index) => (
-              <motion.div
-                key={exp.role + exp.company + exp.period}
-                className="relative flex gap-8"
-                variants={itemVariants}
-              >
-                {/* Timeline dot */}
-                <motion.div
-                  className="relative z-10 hidden md:block"
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
-                >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent bg-background">
-                    <Building2 size={18} className="text-accent-light" />
-                  </div>
-                </motion.div>
-
-                {/* Content */}
-                <motion.div
-                  className="flex-1 rounded-2xl border border-border bg-surface p-6 transition-all"
-                  whileHover={{
-                    y: -3,
-                    boxShadow: "0 16px 32px rgba(30, 58, 95, 0.12)",
-                    borderColor: "var(--accent-light)",
-                  }}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <h4 className="text-lg font-semibold">{exp.role}</h4>
-                      <p className="text-sm text-accent-light">{exp.company}</p>
-                      <p className="mt-0.5 text-xs text-muted">{exp.type}</p>
-                    </div>
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs text-muted">
-                      <Calendar size={11} />
-                      {exp.period}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-muted">
-                    {exp.description}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {exp.technologies.map((tech) => (
-                      <motion.span
-                        key={tech}
-                        className="rounded-full bg-accent/15 px-2.5 py-1 text-xs font-medium text-accent-light"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        {tech}
-                      </motion.span>
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
+    <div className="flex flex-col justify-between min-h-full gap-5 sm:gap-6">
+      {/* Header */}
+      <div className="border-b border-white/10 pb-3 sm:pb-4 shrink-0">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
+          Production experience &amp; <span className="gradient-pastel-text">impact.</span>
+        </h2>
+        <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+          From early public sector infrastructure projects to leading product strategy and mobile engineering at enterprise scale.
+        </p>
       </div>
-    </AnimatedSection>
+
+      {/* Pipeline Stream Container */}
+      <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-black/60 overflow-hidden divide-y divide-white/10 flex-1 overflow-y-auto custom-card-scroll max-h-[380px] sm:max-h-[460px]">
+        {experiences.map((exp) => (
+          <div
+            key={exp.role + exp.company + exp.period}
+            className="group p-4 sm:p-5 lg:p-6 transition-colors hover:bg-white/[0.02]"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                    {exp.role}
+                  </h3>
+                  <span className="text-zinc-600">/</span>
+                  <span className="text-xs sm:text-sm font-medium text-zinc-300">
+                    {exp.company}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] font-mono text-zinc-500">
+                  <span>{exp.type}</span>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Calendar size={10} />
+                    {exp.period}
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Pill */}
+              <div>
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 sm:px-2.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider ${
+                    exp.status === "ACTIVE"
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                      : exp.status === "PRODUCTION"
+                      ? "border-[#C7B8F5]/40 bg-[#C7B8F5]/10 text-[#C7B8F5]"
+                      : "border-white/10 bg-zinc-900 text-zinc-400"
+                  }`}
+                >
+                  {exp.status === "ACTIVE" && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  )}
+                  [ {exp.status} ]
+                </span>
+              </div>
+            </div>
+
+            <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-3xl">
+              {exp.description}
+            </p>
+
+            <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 border-t border-white/5">
+              {exp.technologies.map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded border border-white/10 bg-zinc-900 px-2 py-0.5 font-mono text-[8px] sm:text-[9px] text-zinc-400"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer bar */}
+      <div className="rounded-lg sm:rounded-xl border border-white/10 bg-zinc-950 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between font-mono text-xs text-zinc-400 shrink-0">
+        <span className="text-[10px] sm:text-xs">[ 10 Deployments &amp; Leadership ]</span>
+        <span className="text-white font-medium text-[10px] sm:text-xs">100% On-Time</span>
+      </div>
+    </div>
   );
 }

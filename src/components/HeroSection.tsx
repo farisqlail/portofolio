@@ -1,412 +1,217 @@
-import { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import {
-  motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { ArrowRight, Briefcase, Menu } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, ArrowUpRight, CheckCircle2 } from "lucide-react";
 
-const floatingLabels = [
-  { text: "CODE", className: "left-[7%] top-[31%]" },
-  { text: "PRODUCT", className: "right-[8%] top-[38%]" },
-  { text: "IMPACT", className: "right-[15%] bottom-[24%]" },
-];
-
-const codeSnippets = [
-  { text: "const vision = ship()", className: "left-[8%] top-[19%]" },
-  { text: "product.fit === true", className: "right-[5%] top-[21%]" },
-  { text: "latency < 80ms", className: "left-[5%] bottom-[20%]" },
-  { text: "deploy --precise", className: "right-[9%] bottom-[15%]" },
-];
-
-function FloatingLabel({
-  text,
-  className,
-}: {
-  text: string;
-  className: string;
-}) {
-  return (
-    <motion.span
-      className={`pointer-events-none absolute z-30 hidden rounded-full border border-[#2F80FF]/20 bg-[#05070c]/45 px-3 py-1 text-[0.66rem] font-bold uppercase tracking-tight text-white/65 backdrop-blur-md md:block ${className}`}
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
-    >
-      &gt; {text}
-    </motion.span>
-  );
+interface FocusArea {
+  id: string;
+  title: string;
+  subtitle: string;
+  points: string[];
 }
 
-function CodeSnippet({ text, className }: { text: string; className: string }) {
-  return (
-    <motion.span
-      className={`pointer-events-none absolute z-30 hidden rounded-md bg-white/[0.035] px-2.5 py-1 text-[0.58rem] font-semibold tracking-tight text-[#9fc6ff]/70 backdrop-blur-md lg:block ${className}`}
-      animate={{ y: [0, -8, 0], opacity: [0.42, 0.76, 0.42] }}
-      transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
-    >
-      {text}
-    </motion.span>
-  );
-}
+const focusAreas: FocusArea[] = [
+  {
+    id: "systems",
+    title: "System Architecture",
+    subtitle: "Scalable backends & cloud infrastructure",
+    points: [
+      "Microservices & resilient RESTful APIs in Laravel & Node.js",
+      "Robust relational database design in PostgreSQL & MySQL",
+      "High-throughput caching with Redis and async queues",
+    ],
+  },
+  {
+    id: "frontend",
+    title: "Modern Full-Stack",
+    subtitle: "High-performance web & mobile interfaces",
+    points: [
+      "Production Next.js 16, React 19, and typed TypeScript",
+      "Cross-platform mobile apps using React Native & Flutter",
+      "Pixel-level precision, fluid animations & accessibility",
+    ],
+  },
+  {
+    id: "leadership",
+    title: "Product Leadership",
+    subtitle: "Zero-to-one delivery & engineering management",
+    points: [
+      "Led cross-functional teams at InterActive Technologies Corp",
+      "Founder of @LailDev agency shipping across sectors",
+      "Direct translation of business goals into production software",
+    ],
+  },
+];
 
 export default function HeroSection() {
-  const heroRef = useRef<HTMLElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const pointerTargetRef = useRef({ x: 0, y: 0 });
-  const pointerCurrentRef = useRef({ x: 0, y: 0 });
-  const portraitContainerRef = useRef<HTMLDivElement>(null);
-
-  const [isOver, setIsOver] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const hoverLayerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setIsTouchDevice(window.matchMedia("(hover: none)").matches);
-  }, []);
-
-  const setSpotlight = useCallback((x: number, y: number) => {
-    if (!hoverLayerRef.current) return;
-    const mask = `radial-gradient(circle 380px at ${x}px ${y}px, black 0%, black 40%, transparent 78%)`;
-    hoverLayerRef.current.style.maskImage = mask;
-    hoverLayerRef.current.style.webkitMaskImage = mask;
-  }, []);
-
-  const handleImageMouseEnter = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      if (isTouchDevice || !portraitContainerRef.current) return;
-      const rect = portraitContainerRef.current.getBoundingClientRect();
-      setSpotlight(e.clientX - rect.left, e.clientY - rect.top);
-      setIsOver(true);
-    },
-    [isTouchDevice, setSpotlight],
-  );
-
-  const handleImageMouseLeave = useCallback(() => {
-    setIsOver(false);
-  }, []);
-
-  const handleImageMouseMove = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
-      if (!portraitContainerRef.current || isTouchDevice) return;
-      const rect = portraitContainerRef.current.getBoundingClientRect();
-      setSpotlight(e.clientX - rect.left, e.clientY - rect.top);
-    },
-    [isTouchDevice, setSpotlight],
-  );
-
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const portraitRotateX = useMotionValue(0);
-  const portraitRotateY = useMotionValue(0);
-
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end end"],
-  });
-
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.35,
-  });
-
-  const portraitScale = useTransform(progress, [0, 0.45, 1], [1, 1.05, 1.13]);
-  const portraitY = useTransform(progress, [0, 1], [0, -64]);
-  const portraitOpacity = useTransform(progress, [0, 0.86, 1], [1, 1, 0.55]);
-  const portraitFilter = useTransform(
-    progress,
-    [0, 0.35, 0.72, 1],
-    [
-      "contrast(0.94) saturate(0.92) brightness(0.88)",
-      "contrast(1.06) saturate(1.04) brightness(1)",
-      "contrast(1.12) saturate(1.08) brightness(1.04)",
-      "contrast(1.02) saturate(0.98) brightness(0.9)",
-    ],
-  );
-
-  const titleLeftX = useTransform(progress, [0, 1], [0, -165]);
-  const titleRightX = useTransform(progress, [0, 1], [0, 145]);
-  const titleScale = useTransform(progress, [0, 1], [1, 1.1]);
-  const titleOpacity = useTransform(progress, [0, 0.72, 1], [0.12, 0.2, 0.035]);
-  const titleBlur = useTransform(
-    progress,
-    [0, 0.58, 1],
-    ["blur(0px)", "blur(1px)", "blur(6px)"],
-  );
-
-  const glowScale = useTransform(progress, [0, 0.55, 1], [0.92, 1.12, 1.25]);
-  const glowOpacity = useTransform(progress, [0, 0.55, 1], [0.36, 0.72, 0.28]);
-  const contourX = useTransform(progress, [0, 1], [0, -48]);
-  const contourY = useTransform(progress, [0, 1], [0, 28]);
-  const hudOpacity = useTransform(
-    progress,
-    [0, 0.18, 0.72, 1],
-    [0.28, 0.92, 0.55, 0],
-  );
-  const metaY = useTransform(progress, [0, 0.65, 1], [0, -34, -96]);
-  const metaOpacity = useTransform(progress, [0, 0.72, 1], [1, 0.82, 0]);
-  const foregroundMask = useTransform(
-    progress,
-    [0, 0.45, 1],
-    [
-      "linear-gradient(180deg, black 0%, black 88%, transparent 100%)",
-      "linear-gradient(180deg, black 0%, black 74%, transparent 100%)",
-      "linear-gradient(180deg, black 0%, black 56%, transparent 100%)",
-    ],
-  );
-
-  useEffect(() => {
-    const tick = () => {
-      const current = pointerCurrentRef.current;
-      const target = pointerTargetRef.current;
-      current.x += (target.x - current.x) * 0.08;
-      current.y += (target.y - current.y) * 0.08;
-
-      pointerX.set(current.x * 18);
-      pointerY.set(current.y * 12);
-      portraitRotateX.set(current.y * -3.2);
-      portraitRotateY.set(current.x * 3.8);
-
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [pointerX, pointerY, portraitRotateX, portraitRotateY]);
-
-  function handleMouseMove(event: MouseEvent<HTMLElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    pointerTargetRef.current = {
-      x: ((event.clientX - rect.left) / rect.width - 0.5) * 2,
-      y: ((event.clientY - rect.top) / rect.height - 0.5) * 2,
-    };
-  }
-
-  function handleMouseLeave() {
-    pointerTargetRef.current = { x: 0, y: 0 };
-  }
+  const [activeFocus, setActiveFocus] = useState(0);
+  const current = focusAreas[activeFocus];
 
   return (
-    <section ref={heroRef} className="relative h-[150vh] bg-[#03060b] sm:h-[185vh]">
-      <div
-        className="hero-scroll-stage sticky top-0 isolate h-screen overflow-hidden text-white"
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
-        <motion.div
-          className="scroll-hero-contours pointer-events-none absolute inset-0 -z-30 opacity-80"
-          style={{ x: contourX, y: contourY }}
-        />
-        <motion.div
-          className="scroll-hero-grid pointer-events-none absolute inset-0 -z-20"
-          style={{ opacity: hudOpacity }}
-        />
-        <div className="scroll-hero-grain pointer-events-none absolute inset-0 z-50" />
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_44%,rgba(47,128,255,0.22),transparent_34%),radial-gradient(circle_at_12%_18%,rgba(47,128,255,0.13),transparent_22%),linear-gradient(135deg,#03060b_0%,#05070c_52%,#020308_100%)]" />
-
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-[45%] -z-10 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2F80FF]/24 blur-[118px]"
-          style={{ scale: glowScale, opacity: glowOpacity }}
-        />
-
-        <motion.header
-          className="absolute inset-x-0 top-0 z-40 flex items-start justify-between px-5 py-5 sm:px-8 lg:px-10"
-          style={{ y: metaY, opacity: metaOpacity }}
-        >
-          <a href="#" className="group leading-none" aria-label="Go to home">
-            <span className="gradient-text block text-[2.2rem] font-bold leading-[0.9] tracking-tight sm:text-[3rem]">
-              Faris
-            </span>
-            <span className="gradient-text block text-[2.2rem] font-bold leading-[0.9] tracking-tight sm:text-[3rem]">
-              Rizqilail
-            </span>
-          </a>
-
-          {/* <motion.div className="absolute left-1/2 top-7 hidden -translate-x-1/2 text-5xl font-bold tracking-tight text-white/90 sm:block">
-            L7
-          </motion.div> */}
-
-          <div className="flex items-center gap-3">
-            <motion.a
-              href="#projects"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#2F80FF] px-4 text-sm font-bold tracking-tight text-white shadow-[0_16px_42px_rgba(47,128,255,0.28)] transition hover:bg-[#1f6fe8] sm:h-18 sm:gap-3 sm:px-7 sm:text-2xl"
-              whileHover={{ y: -2, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Briefcase className="h-4 w-4 sm:h-7 sm:w-7" />
-              <span className="hidden sm:inline">Projects</span>
-            </motion.a>
-            <motion.a
-              href="#contact"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border-[3px] border-white/70 bg-white/4.5 text-white backdrop-blur-sm transition hover:border-[#2F80FF] hover:bg-[#2F80FF]/15 sm:h-18 sm:w-18"
-              aria-label="Contact Faris"
-              whileHover={{ y: -2, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Menu className="h-5 w-5 sm:h-8 sm:w-8" strokeWidth={3} />
-            </motion.a>
-          </div>
-        </motion.header>
-
-        <div className="absolute inset-0 z-0 flex items-center justify-center">
-          <motion.div
-            className="font-serif absolute top-[18%] flex w-[130vw] justify-center overflow-hidden text-[clamp(4.5rem,15vw,15rem)] font-bold uppercase leading-[0.82] tracking-tight text-white"
-            style={{
-              x: titleLeftX,
-              scale: titleScale,
-              opacity: titleOpacity,
-              filter: titleBlur,
-            }}
-          >
-            FARIS
-          </motion.div>
-          <motion.div
-            className="font-serif absolute top-[34%] flex w-[150vw] justify-center overflow-hidden text-[clamp(4.5rem,15vw,15rem)] font-bold uppercase leading-[0.82] tracking-tight text-white"
-            style={{
-              x: titleRightX,
-              scale: titleScale,
-              opacity: titleOpacity,
-              filter: titleBlur,
-            }}
-          >
-            RIZQILAIL
-          </motion.div>
+    <div className="flex flex-col justify-between min-h-full gap-6 sm:gap-8">
+      {/* Top Banner Tag */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3 shrink-0">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-0.5 sm:px-3.5 sm:py-1 text-[11px] sm:text-xs text-zinc-300 backdrop-blur-md">
+          <span className="flex h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-400" />
+          <span>Available for roles &amp; consulting</span>
         </div>
 
-        {floatingLabels.map((label) => (
-          <FloatingLabel key={label.text} {...label} />
-        ))}
-        {codeSnippets.map((snippet) => (
-          <CodeSnippet key={snippet.text} {...snippet} />
-        ))}
-
-        <motion.div
-          className="absolute bottom-8 left-5 z-30 hidden w-[9.4rem] rounded-md bg-[#05070c]/62 p-4 shadow-[0_14px_40px_rgba(0,0,0,0.24)] backdrop-blur-sm lg:block"
-          style={{ y: metaY, opacity: metaOpacity }}
-        >
-          <div className="absolute -top-3 left-0 bg-[#2F80FF] px-1 text-[0.62rem] font-bold uppercase leading-none tracking-tight text-white">
-            Profile
-          </div>
-          <p className="border-b border-white/25 pb-2 text-center text-[0.68rem] font-bold uppercase leading-tight tracking-tight text-white/80">
-            Software
-            <br />
-            Engineer
-          </p>
-          <p className="mt-4 text-center text-[0.58rem] font-bold uppercase leading-tight tracking-tight text-white/60">
-            Founder
-            <br />
-            of LailDev
-          </p>
-        </motion.div>
-
-        <motion.div
-          className="pointer-events-none absolute bottom-[8%] right-5 z-30 hidden max-w-[18rem] text-right lg:block"
-          style={{ y: metaY, opacity: metaOpacity }}
-        >
-          <p className="text-[0.72rem] font-bold uppercase tracking-tight text-[#2F80FF]/90">
-            Code / Product / Impact
-          </p>
-          <p className="mt-3 text-sm font-semibold leading-6 text-white/56">
-            Building digital products with precision.
-          </p>
-        </motion.div>
-
-        {/* <motion.div
-          className="pointer-events-none absolute left-1/2 top-[19%] z-30 -translate-x-1/2 text-5xl font-bold tracking-tight text-white/80"
-          style={{ x: signatureX, opacity: signatureOpacity }}
-        >
-          L7
-        </motion.div> */}
-
-        <motion.div
-          className="absolute inset-x-0 bottom-0 z-20 mx-auto flex h-[82vh] max-w-[76rem] justify-center px-5 [perspective:1200px]"
-          style={{ WebkitMaskImage: foregroundMask, maskImage: foregroundMask }}
-        >
-          <motion.div
-            ref={portraitContainerRef}
-            className="scroll-portrait relative aspect-square w-[min(88vw,44rem)] self-end overflow-hidden sm:w-[min(72vw,49rem)] lg:w-[min(48vw,56rem)]"
-            style={{
-              x: pointerX,
-              y: portraitY,
-              scale: portraitScale,
-              opacity: portraitOpacity,
-              rotateX: portraitRotateX,
-              rotateY: portraitRotateY,
-              filter: portraitFilter,
-              transformStyle: "preserve-3d",
-            }}
-            onMouseEnter={handleImageMouseEnter}
-            onMouseLeave={handleImageMouseLeave}
-            onMouseMove={handleImageMouseMove}
-          >
-            <Image
-              src="/assets/images/faris-hero-2.png"
-              alt="Faris Rizqilail portrait"
-              fill
-              priority
-              sizes="(max-width: 768px) 88vw, 52vw"
-              className="scroll-portrait__image object-cover object-center"
-            />
-            {!isTouchDevice && (
-              <div
-                ref={hoverLayerRef}
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: 10,
-                  opacity: isOver ? 1 : 0,
-                  transition: "opacity 0.3s ease",
-                  maskImage:
-                    "radial-gradient(circle 380px at 50% 50%, black 0%, black 40%, transparent 78%)",
-                }}
-              >
-                <Image
-                  src="/assets/images/faris-hero-hover.png"
-                  alt="Faris Rizqilail portrait hover"
-                  fill
-                  sizes="(max-width: 770px) 88vw, 52vw"
-                  className="object-cover"
-                  style={{ marginTop: 40, paddingRight: 20 }}
-                />
-              </div>
-            )}
-            <div className="scroll-portrait__scanlines" />
-            <div className="scroll-portrait__scanner" />
-            <div className="scroll-portrait__sweep" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(3,6,11,0.28)_100%)]" />
-          </motion.div>
-        </motion.div>
-
-        {/* Mobile role badge — replaces the lg:block side panels */}
-        <motion.div
-          className="absolute bottom-20 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full border border-[#2F80FF]/20 bg-[#05070c]/60 px-3 py-1.5 text-[0.6rem] font-bold uppercase tracking-tight text-white/60 backdrop-blur-md sm:hidden"
-          style={{ opacity: metaOpacity }}
-        >
-          <span className="text-[#2F80FF]/80">Software Engineer</span>
-          <span className="text-white/30">·</span>
-          <span>Founder of LailDev</span>
-        </motion.div>
-
-        <motion.div
-          className="absolute bottom-7 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full bg-[#05070c]/72 px-4 py-2 text-[0.62rem] font-bold uppercase tracking-tight text-white/68 backdrop-blur-sm"
-          style={{ opacity: metaOpacity }}
-        >
-          <span>Scroll to enter</span>
-          <ArrowRight className="h-3.5 w-3.5 rotate-90" />
-        </motion.div>
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-40 bg-gradient-to-b from-transparent via-[#03060b]/58 to-[#03060b]" />
+        <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs text-zinc-400">
+          <span>Surabaya, ID</span>
+          <span>·</span>
+          <span className="text-emerald-400 font-semibold">Online</span>
+        </div>
       </div>
-    </section>
+
+      {/* Main 2-Column Responsive Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center flex-1">
+        {/* Left Column: Typography & CTAs */}
+        <div className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-6">
+          <div>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-[1.12]">
+              Engineering scalable systems with{" "}
+              <span className="gradient-pastel-text">craft &amp; precision.</span>
+            </h1>
+
+            <p className="mt-2.5 sm:mt-4 text-xs sm:text-sm md:text-base text-zinc-300 leading-relaxed max-w-xl">
+              I&apos;m <strong className="text-white font-semibold">Faris Rizqilail</strong>. 7+ years building and shipping production web applications, distributed APIs, and mobile clients across enterprise, government, and startup ventures.
+            </p>
+          </div>
+
+          {/* Interactive Technical Highlights */}
+          <div className="w-full max-w-xl rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] p-3 sm:p-4 space-y-2.5 sm:space-y-3 backdrop-blur-md">
+            {/* Tabs */}
+            <div className="flex items-center gap-1 sm:gap-1.5 border-b border-white/10 pb-2 overflow-x-auto">
+              {focusAreas.map((area, idx) => (
+                <button
+                  key={area.id}
+                  onClick={() => setActiveFocus(idx)}
+                  className={`rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-medium transition-all shrink-0 cursor-pointer ${
+                    activeFocus === idx
+                      ? "bg-white text-black font-semibold shadow-sm"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {area.title}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Details */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.id}
+                initial={{ opacity: 0, y: 3 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -3 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-1.5 pt-0.5"
+              >
+                <p className="text-[11px] sm:text-xs font-medium text-zinc-400">
+                  {current.subtitle}
+                </p>
+                <div className="space-y-1">
+                  {current.points.map((pt, idx) => (
+                    <div key={idx} className="flex items-start gap-1.5 text-xs sm:text-sm text-zinc-300">
+                      <CheckCircle2 size={12} className="text-[#C7B8F5] shrink-0 mt-0.5" />
+                      <span>{pt}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
+            <a
+              href="mailto:farisqlail@gmail.com"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-white px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-black transition-all hover:bg-zinc-200 shadow-md"
+            >
+              <span>Get in Touch</span>
+              <ArrowRight size={13} />
+            </a>
+
+            <a
+              href="https://github.com/farisqlail"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-zinc-200 transition-colors hover:text-white hover:border-white/30"
+            >
+              <span>GitHub</span>
+              <ArrowUpRight size={12} />
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/faris-rizqilail-630329194/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.04] px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-zinc-200 transition-colors hover:text-white hover:border-white/30"
+            >
+              <span>LinkedIn</span>
+              <ArrowUpRight size={12} />
+            </a>
+          </div>
+        </div>
+
+        {/* Right Column: Portrait Card */}
+        <div className="lg:col-span-5 flex flex-col justify-center items-center">
+          <div className="relative w-full max-w-[240px] sm:max-w-xs md:max-w-sm rounded-xl sm:rounded-2xl border border-white/15 bg-white/[0.02] p-2.5 sm:p-3.5 backdrop-blur-xl shadow-2xl overflow-hidden group">
+            {/* Window Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-[#ff5f56]" />
+                <span className="h-2 w-2 rounded-full bg-[#ffbd2e]" />
+                <span className="h-2 w-2 rounded-full bg-[#27c93f]" />
+                <span className="ml-1.5 font-mono text-[10px] text-zinc-400">faris.sh</span>
+              </div>
+              <span className="text-[9px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                Active
+              </span>
+            </div>
+
+            {/* Photo Container */}
+            <div className="relative aspect-[4/4.5] w-full overflow-hidden rounded-lg sm:rounded-xl bg-zinc-900 border border-white/10">
+              <Image
+                src="/assets/images/faris-hero-2.png"
+                alt="Faris Rizqilail"
+                fill
+                priority
+                className="object-cover object-top transition-transform duration-700 group-hover:scale-103"
+                sizes="(max-width: 1024px) 70vw, 35vw"
+              />
+
+              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 pointer-events-none" />
+
+              <div className="absolute bottom-2 left-2 right-2 z-20 rounded-lg border border-white/15 bg-black/85 p-2 backdrop-blur-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold text-white leading-tight">Faris Rizqilail</p>
+                    <p className="text-[9px] text-zinc-400">Founder @LailDev · Product Lead</p>
+                  </div>
+                  <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Metrics Row at Bottom */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 border-t border-white/10 pt-3 sm:pt-4 shrink-0 text-xs">
+        <div>
+          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight">7+</p>
+          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">Years Exp</p>
+        </div>
+        <div className="border-l border-white/10 pl-2.5 sm:pl-4">
+          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight">9+</p>
+          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">Ventures</p>
+        </div>
+        <div className="border-l border-white/10 pl-2.5 sm:pl-4">
+          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-[#A7EADC] tracking-tight">100%</p>
+          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">Velocity</p>
+        </div>
+      </div>
+    </div>
   );
 }
