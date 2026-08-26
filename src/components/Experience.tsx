@@ -117,17 +117,20 @@ export default function Experience() {
   return (
     <div className="flex flex-col justify-between min-h-full gap-5 sm:gap-6">
       {/* Header */}
-      <div className="border-b border-white/10 pb-3 sm:pb-4 shrink-0">
+      <div className="border-b border-dashed border-white/15 pb-3 sm:pb-4 shrink-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
-          Production experience &amp; <span className="gradient-pastel-text">impact.</span>
+          Production experience &amp;{" "}
+          <span className="text-[#FF5500] underline decoration-dashed decoration-[#FF5500]/50 underline-offset-8">
+            impact.
+          </span>
         </h2>
-        <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+        <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed font-sans">
           From early public sector infrastructure projects to leading product strategy and mobile engineering at enterprise scale.
         </p>
       </div>
 
       {/* Pipeline Stream Container */}
-      <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-black/60 overflow-hidden divide-y divide-white/10 flex-1 overflow-y-auto custom-card-scroll max-h-[380px] sm:max-h-[460px]">
+      <div className="rounded-xl border border-dashed border-white/20 bg-black/60 overflow-hidden divide-y divide-dashed divide-white/15 flex-1 overflow-y-auto custom-card-scroll max-h-[380px] sm:max-h-[460px]">
         {experiences.map((exp) => (
           <div
             key={exp.role + exp.company + exp.period}
@@ -136,18 +139,18 @@ export default function Experience() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
               <div className="space-y-0.5">
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                  <h3 className="text-sm sm:text-base font-bold text-white tracking-tight font-sans">
                     {exp.role}
                   </h3>
-                  <span className="text-zinc-600">/</span>
-                  <span className="text-xs sm:text-sm font-medium text-zinc-300">
+                  <span className="text-zinc-600 font-mono">/</span>
+                  <span className="text-xs sm:text-sm font-medium text-zinc-300 font-sans">
                     {exp.company}
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] font-mono text-zinc-500">
-                  <span>{exp.type}</span>
-                  <span>·</span>
+                <div className="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] font-mono text-zinc-400">
+                  <span>[{exp.type}]</span>
+                  <span className="text-zinc-600">·</span>
                   <span className="inline-flex items-center gap-1">
                     <Calendar size={10} />
                     {exp.period}
@@ -158,31 +161,31 @@ export default function Experience() {
               {/* Status Pill */}
               <div>
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2 sm:px-2.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider ${
+                  className={`inline-flex items-center gap-1.5 rounded border border-dashed px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${
                     exp.status === "ACTIVE"
-                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                      ? "border-[#A3E635]/40 bg-[#A3E635]/10 text-[#A3E635]"
                       : exp.status === "PRODUCTION"
-                      ? "border-[#C7B8F5]/40 bg-[#C7B8F5]/10 text-[#C7B8F5]"
-                      : "border-white/10 bg-zinc-900 text-zinc-400"
+                      ? "border-[#FF5500]/40 bg-[#FF5500]/10 text-[#FF5500]"
+                      : "border-white/15 bg-zinc-950 text-zinc-400"
                   }`}
                 >
                   {exp.status === "ACTIVE" && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="h-1.5 w-1.5 bg-[#A3E635] animate-pulse" />
                   )}
                   [ {exp.status} ]
                 </span>
               </div>
             </div>
 
-            <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-3xl">
+            <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-3xl font-sans">
               {exp.description}
             </p>
 
-            <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 border-t border-white/5">
+            <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center gap-1 sm:gap-1.5 pt-2 border-t border-dashed border-white/10">
               {exp.technologies.map((tech) => (
                 <span
                   key={tech}
-                  className="rounded border border-white/10 bg-zinc-900 px-2 py-0.5 font-mono text-[8px] sm:text-[9px] text-zinc-400"
+                  className="rounded border border-dashed border-white/15 bg-white/[0.03] px-2 py-0.5 font-mono text-[8px] sm:text-[9px] text-zinc-300"
                 >
                   {tech}
                 </span>
@@ -193,9 +196,9 @@ export default function Experience() {
       </div>
 
       {/* Footer bar */}
-      <div className="rounded-lg sm:rounded-xl border border-white/10 bg-zinc-950 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between font-mono text-xs text-zinc-400 shrink-0">
-        <span className="text-[10px] sm:text-xs">[ 10 Deployments &amp; Leadership ]</span>
-        <span className="text-white font-medium text-[10px] sm:text-xs">100% On-Time</span>
+      <div className="rounded-lg border border-dashed border-white/15 bg-zinc-950 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between font-mono text-xs text-zinc-400 shrink-0">
+        <span className="text-[10px] sm:text-xs text-[#FF5500] font-bold">[ 10 DEPLOYMENTS &amp; LEADERSHIP ]</span>
+        <span className="text-[#A3E635] text-[10px] sm:text-xs">STATUS: 100%_VERIFIED</span>
       </div>
     </div>
   );

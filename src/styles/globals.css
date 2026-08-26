@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
+  --background: #060608;
   --foreground: #f4f4f5;
-  --surface: #0a0a0d;
-  --surface-light: #121216;
-  --surface-hover: #18181d;
-  --border: #222226;
-  --border-subtle: #18181b;
-  --border-strong: #2e2e34;
+  --surface: #0a0a0e;
+  --surface-light: #111116;
+  --surface-hover: #17171e;
+  --border: #222228;
+  --border-subtle: #18181f;
+  --border-strong: #2e2e38;
   --muted: #8b8b93;
   --muted-foreground: #a1a1aa;
 
-  /* Langbase Pastel Palette */
+  /* Stitch Theme Palette */
+  --accent-ember: #FF5500;
+  --accent-lime: #A3E635;
   --accent-lavender: #C7B8F5;
   --accent-rose: #F3B5D2;
   --accent-peach: #F6D1AC;
   --accent-mint: #A7EADC;
   --accent-sky: #AFCDF6;
-  --accent-glow: #3b82f6;
+  --accent-glow: #FF5500;
   --accent: #27272a;
   --accent-light: #3f3f46;
 }
@@ -34,6 +36,8 @@
   --color-border-strong: var(--border-strong);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-accent-ember: var(--accent-ember);
+  --color-accent-lime: var(--accent-lime);
   --color-accent-lavender: var(--accent-lavender);
   --color-accent-rose: var(--accent-rose);
   --color-accent-peach: var(--accent-peach);

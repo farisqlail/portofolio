@@ -222,7 +222,16 @@ export default function AmbientGridBeams() {
   ];
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-[#040406] select-none">
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-[#050508] select-none">
+      {/* Blueprint Micro Grid Overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.06] z-10 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
+          backgroundSize: "24px 24px",
+        }}
+      />
+
       {/* Dashed vertical grid guides */}
       <div className="absolute inset-0 grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 divide-x divide-dashed divide-white/[0.07] opacity-80" />
 
@@ -248,7 +257,7 @@ export default function AmbientGridBeams() {
                       width: `${beam.width}px`,
                       height: `${beam.height}px`,
                       background: beam.gradient,
-                      boxShadow: "0 0 25px rgba(244,63,94,0.3)",
+                      boxShadow: "0 0 25px rgba(255,85,0,0.25)",
                       "--beam-dur": `${beam.duration}s`,
                       "--beam-del": `${beam.delay}s`,
                     } as React.CSSProperties
@@ -264,7 +273,7 @@ export default function AmbientGridBeams() {
       </div>
 
       {/* Subtle vignette */}
-      <div className="absolute inset-0 bg-radial from-transparent via-black/20 to-black/80 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial from-transparent via-black/20 to-black/85 pointer-events-none z-10" />
     </div>
   );
 }

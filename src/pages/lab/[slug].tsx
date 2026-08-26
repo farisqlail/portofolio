@@ -92,11 +92,20 @@ export default function ExperimentDetail({
       </Head>
 
       <div
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-black text-foreground font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#07070a] text-foreground font-sans relative overflow-hidden`}
       >
+        {/* Subtle Background Blueprint Grid */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.06]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)`,
+            backgroundSize: "24px 24px",
+          }}
+        />
+
         <Navbar activeIndex={5} />
 
-        <main className="mx-auto max-w-4xl px-4 sm:px-6 pt-28 sm:pt-36 pb-20">
+        <main className="mx-auto max-w-4xl px-4 sm:px-6 pt-24 sm:pt-32 pb-20 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -107,45 +116,52 @@ export default function ExperimentDetail({
             <div className="flex items-center justify-between">
               <Link
                 href="/#experiments"
-                className="inline-flex items-center gap-1.5 font-mono text-xs text-zinc-400 hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 font-mono text-xs text-zinc-400 hover:text-white border border-dashed border-white/20 rounded-md px-3 py-1.5 bg-black/40 backdrop-blur-md transition-colors"
               >
                 <ArrowLeft size={13} />
-                <span>[ Back to Lab ]</span>
+                <span>[ BACK TO LAB ]</span>
               </Link>
 
-              <span className="font-mono text-[11px] text-zinc-500">
-                PROTOTYPE // {category.toUpperCase()}
-              </span>
+              <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
+                <span className="h-1.5 w-1.5 bg-[#FF5500]" />
+                <span>SPEC // {category.toUpperCase()}</span>
+              </div>
             </div>
 
-            {/* Main Spec Card */}
-            <div className="relative rounded-2xl border border-white/10 bg-[#0a0a0e] p-6 sm:p-8 md:p-10 shadow-2xl overflow-hidden space-y-6 sm:space-y-8">
+            {/* Main Spec Card with Stitch styling */}
+            <div className="relative rounded-2xl border border-dashed border-white/20 bg-[#0c0c12]/95 p-6 sm:p-8 md:p-10 shadow-[0_25px_80px_rgba(0,0,0,0.9)] backdrop-blur-2xl overflow-hidden space-y-6 sm:space-y-8">
+              {/* Corner Cross Stitch Markers */}
+              <span className="absolute top-2 left-2 font-mono text-xs text-zinc-600 select-none font-bold">+</span>
+              <span className="absolute top-2 right-2 font-mono text-xs text-zinc-600 select-none font-bold">+</span>
+              <span className="absolute bottom-2 left-2 font-mono text-xs text-zinc-600 select-none font-bold">+</span>
+              <span className="absolute bottom-2 right-2 font-mono text-xs text-zinc-600 select-none font-bold">+</span>
+
               {/* Header section */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-4">
+                <div className="flex items-center justify-between gap-2 border-b border-dashed border-white/15 pb-4">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 font-mono text-xs text-[#C7B8F5]">
-                      {category}
+                    <span className="rounded border border-[#FF5500]/40 bg-[#FF5500]/10 px-2.5 py-0.5 font-mono text-xs font-bold text-[#FF5500]">
+                      [ {category} ]
                     </span>
-                    <span className="font-mono text-xs text-emerald-400 flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Open Source
+                    <span className="font-mono text-xs text-[#A3E635] flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 bg-[#A3E635] animate-pulse" />
+                      OPEN_SOURCE
                     </span>
                   </div>
-                  {Icon && <Icon size={22} className="text-zinc-400 shrink-0" />}
+                  {Icon && <Icon size={20} className="text-zinc-400 shrink-0" />}
                 </div>
 
                 <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
                   {title}
                 </h1>
 
-                <p className="text-sm sm:text-base leading-relaxed text-zinc-300">
+                <p className="text-sm sm:text-base leading-relaxed text-zinc-300 font-sans">
                   {summary}
                 </p>
               </div>
 
               {/* Show-off Visual Preview Image */}
-              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-zinc-900 border border-white/15 shadow-2xl">
+              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-zinc-900 border border-dashed border-white/20 shadow-2xl">
                 <Image
                   src={image}
                   alt={title}
@@ -160,16 +176,16 @@ export default function ExperimentDetail({
               {/* Technical Specifications Bento */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                 {/* Highlights (7 cols) */}
-                <div className="md:col-span-7 rounded-xl border border-white/10 bg-zinc-950/80 p-5 space-y-3">
-                  <div className="flex items-center gap-2 font-mono text-xs text-zinc-400 uppercase tracking-wider border-b border-white/10 pb-2.5">
-                    <Cpu size={14} className="text-[#C7B8F5]" />
-                    <span>Key Architectural Capabilities</span>
+                <div className="md:col-span-7 rounded-xl border border-dashed border-white/15 bg-black/50 p-5 space-y-3">
+                  <div className="flex items-center gap-2 font-mono text-xs text-[#FF5500] font-bold uppercase tracking-wider border-b border-dashed border-white/10 pb-2.5">
+                    <Cpu size={14} className="text-[#FF5500]" />
+                    <span>[ KEY ARCHITECTURAL CAPABILITIES ]</span>
                   </div>
 
                   <div className="space-y-2.5 pt-1">
                     {highlights.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-zinc-300">
-                        <CheckCircle2 size={13} className="text-[#A7EADC] shrink-0 mt-0.5" />
+                        <span className="font-mono text-[#FF5500] text-xs font-bold shrink-0 mt-0.5">0{idx + 1}/</span>
                         <span>{item}</span>
                       </div>
                     ))}
@@ -177,18 +193,18 @@ export default function ExperimentDetail({
                 </div>
 
                 {/* Tech Stack (5 cols) */}
-                <div className="md:col-span-5 rounded-xl border border-white/10 bg-zinc-950/80 p-5 space-y-3 flex flex-col justify-between">
+                <div className="md:col-span-5 rounded-xl border border-dashed border-white/15 bg-black/50 p-5 space-y-3 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-2 font-mono text-xs text-zinc-400 uppercase tracking-wider border-b border-white/10 pb-2.5 mb-3">
-                      <Layers size={14} className="text-[#F6D1AC]" />
-                      <span>Tech Stack</span>
+                    <div className="flex items-center gap-2 font-mono text-xs text-[#A3E635] font-bold uppercase tracking-wider border-b border-dashed border-white/10 pb-2.5 mb-3">
+                      <Layers size={14} className="text-[#A3E635]" />
+                      <span>[ TECH STACK ]</span>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 font-mono">
                       {techStack.map((tech) => (
                         <span
                           key={tech}
-                          className="font-mono text-[11px] text-zinc-300 bg-white/[0.04] border border-white/10 rounded-md px-2.5 py-1"
+                          className="text-[11px] text-zinc-300 bg-white/[0.04] border border-dashed border-white/15 rounded px-2.5 py-1"
                         >
                           {tech}
                         </span>
@@ -196,31 +212,31 @@ export default function ExperimentDetail({
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-zinc-500 font-mono pt-2 border-t border-white/5">
+                  <p className="text-[11px] text-zinc-500 font-mono pt-2 border-t border-dashed border-white/10">
                     Full implementation details available on GitHub.
                   </p>
                 </div>
               </div>
 
               {/* Full Description Section */}
-              <div className="pt-4 border-t border-white/10 space-y-2">
+              <div className="pt-4 border-t border-dashed border-white/15 space-y-2">
                 <p className="font-mono text-xs text-zinc-500 uppercase tracking-wider">
-                  [ System Description ]
+                  [ SYSTEM DESCRIPTION ]
                 </p>
-                <p className="text-xs sm:text-sm leading-relaxed text-zinc-400">
+                <p className="text-xs sm:text-sm leading-relaxed text-zinc-400 font-sans">
                   {description}
                 </p>
               </div>
 
               {/* Action Bar */}
-              <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+              <div className="pt-4 border-t border-dashed border-white/15 flex flex-wrap items-center justify-between gap-4">
                 <a
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-black hover:bg-zinc-200 transition-all shadow-md"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#FF5500] bg-[#FF5500] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-mono font-bold text-black hover:bg-[#ff6a1f] transition-all shadow-md"
                 >
-                  <span>View Repository on GitHub</span>
+                  <span>[ VIEW REPOSITORY ON GITHUB ↗ ]</span>
                   <ArrowUpRight size={14} />
                 </a>
 
@@ -228,7 +244,7 @@ export default function ExperimentDetail({
                   href="/#experiments"
                   className="font-mono text-xs text-zinc-400 hover:text-white transition-colors"
                 >
-                  ← Back to all prototypes
+                  [ ← RETURN TO PROTOTYPES ]
                 </Link>
               </div>
             </div>
