@@ -18,7 +18,7 @@ const experiences: ExperienceItem[] = [
     period: "Sep 2025 - Present",
     status: "ACTIVE",
     description:
-      "Developing and maintaining mobile applications for KirimFresh.id logistics platform, focusing on user experience, real-time tracking, and performance optimization.",
+      "Building and maintaining mobile applications for the KirimFresh logistics platform with real-time tracking and offline-first state handling.",
     technologies: ["React Native", "iOS", "Android", "REST APIs"],
   },
   {
@@ -28,7 +28,7 @@ const experiences: ExperienceItem[] = [
     period: "Apr 2025 - Present",
     status: "ACTIVE",
     description:
-      "Leading product engineering strategy, managing cross-functional engineering teams, and driving agile development processes to ship enterprise software solutions.",
+      "Leading product engineering across web and mobile teams, managing sprint cycles, architectural reviews, and production releases.",
     technologies: ["Product Leadership", "Agile/Scrum", "System Architecture"],
   },
   {
@@ -38,7 +38,7 @@ const experiences: ExperienceItem[] = [
     period: "Nov 2023 - Sep 2025",
     status: "PRODUCTION",
     description:
-      "Engineered and maintained high-traffic web applications, implemented pixel-perfect UI/UX designs, and collaborated closely with backend engineers for seamless API integration.",
+      "Built responsive web applications in Next.js and TypeScript, integrating backend REST APIs and optimizing frontend load performance.",
     technologies: ["React", "TypeScript", "Next.js", "Tailwind CSS"],
   },
   {
@@ -48,7 +48,7 @@ const experiences: ExperienceItem[] = [
     period: "Dec 2022 - Sep 2023",
     status: "COMPLETED",
     description:
-      "Built responsive web interfaces for GoCement construction ecommerce platform, contributing to digital transformation in industrial supply chains.",
+      "Built responsive web interfaces for the GoCement industrial supply ordering platform using React and REST APIs.",
     technologies: ["React", "JavaScript", "CSS3", "REST APIs"],
   },
   {
@@ -58,7 +58,7 @@ const experiences: ExperienceItem[] = [
     period: "Sep 2022 - Nov 2022",
     status: "COMPLETED",
     description:
-      "Delivered custom web application solutions for enterprise-scale internal operations within the Semen Indonesia group.",
+      "Delivered internal web application tools for operational workflows within the Semen Indonesia group using Laravel and MySQL.",
     technologies: ["PHP", "Laravel", "MySQL", "JavaScript"],
   },
   {
@@ -68,7 +68,7 @@ const experiences: ExperienceItem[] = [
     period: "Feb 2022 - Jul 2022",
     status: "COMPLETED",
     description:
-      "Developed Ideabox innovation platforms with microservices architecture and CodeIgniter framework at Telkom Indonesia's corporate innovation incubator.",
+      "Built microservice backend endpoints for the Ideabox platform using CodeIgniter and MySQL.",
     technologies: ["CodeIgniter", "Microservices", "PHP", "MySQL"],
   },
   {
@@ -78,7 +78,7 @@ const experiences: ExperienceItem[] = [
     period: "Feb 2021 - Jan 2022",
     status: "COMPLETED",
     description:
-      "Led Linux community initiatives, organized regional tech events & hackathons, and managed engineering teams for open-source software development.",
+      "Organized regional tech events and hackathons while managing student engineering teams for open-source projects.",
     technologies: ["Leadership", "Laravel", "Linux SysAdmin"],
   },
   {
@@ -88,7 +88,7 @@ const experiences: ExperienceItem[] = [
     period: "Apr 2021 - Jul 2021",
     status: "COMPLETED",
     description:
-      "Engineered backend digital infrastructure systems and secure REST APIs for national-level government public services.",
+      "Developed backend REST APIs in Laravel and PostgreSQL for national-level public service portals.",
     technologies: ["PHP", "Laravel", "REST APIs", "PostgreSQL"],
   },
   {
@@ -98,7 +98,7 @@ const experiences: ExperienceItem[] = [
     period: "Nov 2019 - Jan 2021",
     status: "COMPLETED",
     description:
-      "Created frontend user interfaces for open-source community platforms and web tools.",
+      "Created frontend interfaces and landing pages for open-source student initiatives and community tools.",
     technologies: ["HTML/CSS", "JavaScript", "Bootstrap", "Git"],
   },
   {
@@ -108,7 +108,7 @@ const experiences: ExperienceItem[] = [
     period: "Feb 2018 - Apr 2018",
     status: "COMPLETED",
     description:
-      "Built communication and public information web portals using PHP, AJAX, and Laravel framework for Surabaya city government.",
+      "Built municipal communication portals and submission forms using PHP, AJAX, and Laravel for the Surabaya city government.",
     technologies: ["PHP", "Laravel", "AJAX", "MySQL"],
   },
 ];

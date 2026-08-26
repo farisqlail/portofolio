@@ -28,15 +28,15 @@ export default function Contact({ onSelectCard }: ContactProps) {
       <div className="text-center max-w-2xl mx-auto space-y-3 sm:space-y-4 pt-2 sm:pt-4">
         <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/10 bg-zinc-950 px-3 py-0.5 sm:px-3.5 sm:py-1 text-[11px] sm:text-xs text-zinc-400 font-mono">
           <Sparkles size={11} className="text-[#C7B8F5]" />
-          <span>{"// Direct Communication"}</span>
+          <span>{"// Direct Channels"}</span>
         </div>
 
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-[1.12]">
-          Ready to build something <span className="gradient-pastel-text">extraordinary?</span>
+          Let&apos;s connect &amp; <span className="gradient-pastel-text">build together.</span>
         </h2>
 
         <p className="text-xs sm:text-base text-zinc-400 leading-relaxed max-w-lg mx-auto">
-          Open to full-stack engineering roles, product leadership, and ambitious technical partnerships.
+          Open to full-stack engineering roles, technical advisory, and software development projects.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 pt-1">
@@ -79,7 +79,7 @@ export default function Contact({ onSelectCard }: ContactProps) {
             </div>
           </div>
           <p className="text-[11px] sm:text-xs text-zinc-400 leading-relaxed max-w-sm">
-            Engineering high-scale digital solutions, mobile architectures, and developer-first applications with speed and taste.
+            Engineering web applications, mobile architectures, and developer tools with tested reliability.
           </p>
         </div>
 

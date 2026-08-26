@@ -9,10 +9,10 @@ export default function Experiments() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-3 sm:pb-4 gap-2.5 shrink-0">
         <div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
-            Experimental builds &amp; <span className="gradient-pastel-text">explorations.</span>
+            Prototypes &amp; <span className="gradient-pastel-text">open-source tools.</span>
           </h2>
           <p className="mt-1 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
-            Open-source AI agents, Web3 smart contracts, developer tooling, and experimental side projects.
+            AI multi-agent systems, Web3 smart contracts, code review utilities, and interactive side projects.
           </p>
         </div>
 

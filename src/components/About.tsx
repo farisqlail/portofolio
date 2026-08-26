@@ -3,33 +3,33 @@ import { Code2, Lightbulb, Rocket, ArrowUpRight } from "lucide-react";
 const pillars = [
   {
     num: "01",
-    tag: "Product Thinking",
-    title: "Connecting Code to Business Growth",
+    tag: "Product Delivery",
+    title: "Connecting Code to Business Outcomes",
     description:
-      "From backend services at Kominfo RI to leading product development at InterActive Technologies Corp — I bridge architectural engineering decisions directly to business outcomes and user delight.",
+      "From backend services at Kominfo RI to product development at InterActive Technologies Corp, I align technical architecture with user requirements and business roadmaps.",
     icon: Lightbulb,
     color: "#C7B8F5",
-    bullets: ["User-centric roadmaps", "Agile velocity leadership", "Metric-driven iteration"],
+    bullets: ["User-focused roadmaps", "Sprint execution", "Performance metrics"],
   },
   {
     num: "02",
     tag: "Engineering Depth",
-    title: "Production-Grade Full-Stack",
+    title: "Full-Stack Development",
     description:
-      "Expertise across React/Next.js 16, typed TypeScript, Laravel APIs, PostgreSQL databases, and high-performance cross-platform mobile applications.",
+      "Hands-on experience across Next.js 16, TypeScript, Laravel APIs, PostgreSQL databases, and cross-platform mobile applications.",
     icon: Code2,
     color: "#F3B5D2",
-    bullets: ["Microservices & REST APIs", "Type-safe system design", "Zero-downtime deployments"],
+    bullets: ["REST & GraphQL APIs", "Type-safe architecture", "Automated deployments"],
   },
   {
     num: "03",
-    tag: "Delivery Speed",
-    title: "Ownership from Zero to One",
+    tag: "Execution",
+    title: "End-to-End Ownership",
     description:
-      "7+ years navigating ambiguity across startups, enterprise, and government. Delivering reliable, scalable systems on aggressive production timelines.",
+      "7+ years building software for enterprises, startups, and public sector agencies with structured testing and reliable release cycles.",
     icon: Rocket,
     color: "#F6D1AC",
-    bullets: ["Rapid MVP prototyping", "Clean architecture", "100% on-time track record"],
+    bullets: ["Rapid MVP prototyping", "Clean architecture", "On-schedule shipping"],
   },
 ];
 
@@ -39,7 +39,7 @@ export default function About() {
       {/* Header */}
       <div className="border-b border-white/10 pb-3 sm:pb-4 shrink-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
-          Building software with purpose &amp; <span className="gradient-pastel-text">craftsmanship.</span>
+          Building software with focus &amp; <span className="gradient-pastel-text">engineering rigor.</span>
         </h2>
         <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
           Software Engineer and Founder of{" "}
@@ -51,7 +51,7 @@ export default function About() {
           >
             @LailDev
           </a>
-          . Specializing in resilient digital infrastructure, clean code, and fluid user experiences.
+          . Specializing in web applications, backend APIs, and responsive mobile interfaces.
         </p>
       </div>
 

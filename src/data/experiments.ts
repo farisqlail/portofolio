@@ -15,7 +15,7 @@ export const experiments: Experiment[] = [
     slug: "ai-code-review-assistant",
     title: "AI Code Review Assistant",
     description:
-      "Fullstack AI tool that automatically analyzes code for bugs, security vulnerabilities, and best practices. React + Express frontend/backend proxying Llama 3.3 70B via Groq API with real-time streaming results.",
+      "Full-stack code analysis tool checking for bugs, security vulnerabilities, and adherence to style standards. React and Express backend proxying Llama 3.3 70B via Groq API with real-time SSE streaming.",
     category: "AI / Code Tools",
     icon: Brain,
     href: "https://github.com/farisqlail/review-code-ai",
@@ -24,7 +24,7 @@ export const experiments: Experiment[] = [
     slug: "simple-wallet-web3",
     title: "Simple Wallet Web3",
     description:
-      "Web3 wallet app with Solidity smart contract backend. Handles cryptocurrency transactions and interactions with Ethereum-compatible networks via a JavaScript frontend.",
+      "Web3 wallet application with Solidity smart contracts. Executes token transfers and account balance queries on EVM-compatible testnets via a JavaScript frontend.",
     category: "Web3 / Blockchain",
     icon: Globe,
     href: "https://github.com/farisqlail/simple-wallet-web3",
@@ -33,7 +33,7 @@ export const experiments: Experiment[] = [
     slug: "ai-agents-mini-startup",
     title: "AI Agents Mini Startup",
     description:
-      "Collaborative AI platform with four specialized agents (PM, CTO, Developer, QA) powered by Llama 3.3 70B. Input a project brief — agents autonomously design architecture, write code, and run QA. Export as docs or source code.",
+      "Multi-agent system with four roles (PM, CTO, Developer, QA) powered by Llama 3.3 70B. Input a project brief, and agents generate architectural specs, source code, and test cases.",
     category: "AI / Multi-Agent",
     icon: Sparkles,
     href: "https://github.com/farisqlail/ai-agents-mini-startup",
@@ -42,7 +42,7 @@ export const experiments: Experiment[] = [
     slug: "brongwood-game",
     title: "Brongwood Game",
     description:
-      "A cozy pixel RPG about healing, connection, and finding meaning in a quiet town. Built with TypeScript, focused on intimate narrative and community relationships.",
+      "Pixel RPG built in TypeScript and HTML5 Canvas. Includes dialogue state machines, quest tracking, and custom sprite rendering routines.",
     category: "Game Dev",
     icon: Gamepad2,
     href: "https://github.com/farisqlail/Brongwood-game",

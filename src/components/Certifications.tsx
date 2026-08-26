@@ -52,10 +52,10 @@ export default function Certifications() {
       {/* Header */}
       <div className="border-b border-white/10 pb-3 sm:pb-4 shrink-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
-          Verified credentials &amp; <span className="gradient-pastel-text">hackathon honors.</span>
+          Awards &amp; <span className="gradient-pastel-text">credentials.</span>
         </h2>
         <p className="mt-1.5 text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
-          Competitive programming, regional hackathons, and certified remote engineering management proficiencies.
+          National hackathon awards, regional web competitions, and verified engineering certifications.
         </p>
       </div>
 
@@ -168,7 +168,7 @@ export default function Certifications() {
       {/* Footer bar */}
       <div className="rounded-lg sm:rounded-xl border border-white/10 bg-zinc-950 px-4 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between font-mono text-xs text-zinc-400 shrink-0">
         <span className="text-[10px] sm:text-xs">[ Verified Records ]</span>
-        <span className="text-white font-medium text-[10px] sm:text-xs">100% Authentic</span>
+        <span className="text-white font-medium text-[10px] sm:text-xs">Indexed &amp; Verified</span>
       </div>
     </div>
   );

@@ -93,7 +93,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta
           name="description"
-          content="Faris Rizqilail (farisqlail) — Software Engineer & Founder of LailDev. 7+ years shipping production web, mobile, and cloud software."
+          content="Faris Rizqilail (farisqlail), Software Engineer & Founder of LailDev. 7+ years shipping web, mobile, and cloud software."
         />
         <meta
           name="keywords"
@@ -111,7 +111,7 @@ export default function Home() {
         <meta property="og:title" content="Faris Rizqilail · Software Engineer & Founder @LailDev" />
         <meta
           property="og:description"
-          content="7+ years shipping production web, mobile, and cloud software across enterprise, government, and startup ventures."
+          content="7+ years shipping web, mobile, and backend software for companies, public sector clients, and independent projects."
         />
         <meta property="og:image" content={`${SITE_URL}/assets/images/faris-hero-2.png`} />
 

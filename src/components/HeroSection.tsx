@@ -14,31 +14,31 @@ const focusAreas: FocusArea[] = [
   {
     id: "systems",
     title: "System Architecture",
-    subtitle: "Scalable backends & cloud infrastructure",
+    subtitle: "Backends, databases, and APIs",
     points: [
-      "Microservices & resilient RESTful APIs in Laravel & Node.js",
-      "Robust relational database design in PostgreSQL & MySQL",
-      "High-throughput caching with Redis and async queues",
+      "REST APIs in Laravel, Node.js, and Express",
+      "Relational schema design in PostgreSQL and MySQL",
+      "In-memory caching with Redis and background queues",
     ],
   },
   {
     id: "frontend",
     title: "Modern Full-Stack",
-    subtitle: "High-performance web & mobile interfaces",
+    subtitle: "Web and mobile interfaces",
     points: [
-      "Production Next.js 16, React 19, and typed TypeScript",
-      "Cross-platform mobile apps using React Native & Flutter",
-      "Pixel-level precision, fluid animations & accessibility",
+      "Typed interfaces in Next.js 16, React 19, and TypeScript",
+      "Cross-platform mobile apps using React Native and Flutter",
+      "Responsive layouts with structured component design",
     ],
   },
   {
     id: "leadership",
     title: "Product Leadership",
-    subtitle: "Zero-to-one delivery & engineering management",
+    subtitle: "From requirements to production deployment",
     points: [
       "Led cross-functional teams at InterActive Technologies Corp",
-      "Founder of @LailDev agency shipping across sectors",
-      "Direct translation of business goals into production software",
+      "Founder of LailDev, delivering software across industries",
+      "Converting feature requirements into tested releases",
     ],
   },
 ];
@@ -53,7 +53,7 @@ export default function HeroSection() {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3 shrink-0">
         <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-0.5 sm:px-3.5 sm:py-1 text-[11px] sm:text-xs text-zinc-300 backdrop-blur-md">
           <span className="flex h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-400" />
-          <span>Available for roles &amp; consulting</span>
+          <span>Available for roles &amp; projects</span>
         </div>
 
         <div className="flex items-center gap-2 font-mono text-[10px] sm:text-xs text-zinc-400">
@@ -69,12 +69,12 @@ export default function HeroSection() {
         <div className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-6">
           <div>
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-[1.12]">
-              Engineering scalable systems with{" "}
-              <span className="gradient-pastel-text">craft &amp; precision.</span>
+              Building web applications &amp;{" "}
+              <span className="gradient-pastel-text">backend services.</span>
             </h1>
 
             <p className="mt-2.5 sm:mt-4 text-xs sm:text-sm md:text-base text-zinc-300 leading-relaxed max-w-xl">
-              I&apos;m <strong className="text-white font-semibold">Faris Rizqilail</strong>. 7+ years building and shipping production web applications, distributed APIs, and mobile clients across enterprise, government, and startup ventures.
+              I&apos;m <strong className="text-white font-semibold">Faris Rizqilail</strong>. 7+ years building and shipping web applications, distributed APIs, and mobile clients for enterprise, government, and startup teams.
             </p>
           </div>
 
@@ -208,8 +208,8 @@ export default function HeroSection() {
           <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">Ventures</p>
         </div>
         <div className="border-l border-white/10 pl-2.5 sm:pl-4">
-          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-[#A7EADC] tracking-tight">100%</p>
-          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">Velocity</p>
+          <p className="text-lg sm:text-2xl md:text-3xl font-bold text-[#A7EADC] tracking-tight">12+</p>
+          <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">Projects Delivered</p>
         </div>
       </div>
     </div>
