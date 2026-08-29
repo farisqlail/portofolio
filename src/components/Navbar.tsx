@@ -9,11 +9,11 @@ interface NavbarProps {
 
 const navLinks = [
   { label: "Overview", num: "01", index: 0 },
-  { label: "Philosophy", num: "02", index: 1 },
-  { label: "Capabilities", num: "03", index: 2 },
-  { label: "Experience", num: "04", index: 3 },
-  { label: "Honors", num: "05", index: 4 },
-  { label: "Lab", num: "06", index: 5 },
+  { label: "Lab", num: "02", index: 1 },
+  { label: "Experience", num: "03", index: 2 },
+  { label: "Philosophy", num: "04", index: 3 },
+  { label: "Capabilities", num: "05", index: 4 },
+  { label: "Honors", num: "06", index: 5 },
   { label: "Contact", num: "07", index: 6 },
 ];
 

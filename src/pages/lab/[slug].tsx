@@ -49,6 +49,7 @@ export const getStaticProps = (async ({ params }) => {
       techStack: experiment.techStack,
       highlights: experiment.highlights,
       href: experiment.href,
+      landingHref: experiment.landingHref ?? null,
     },
   };
 }) satisfies GetStaticProps<{
@@ -61,6 +62,7 @@ export const getStaticProps = (async ({ params }) => {
   techStack: string[];
   highlights: string[];
   href: string;
+  landingHref: string | null;
 }>;
 
 export default function ExperimentDetail({
@@ -73,6 +75,7 @@ export default function ExperimentDetail({
   techStack,
   highlights,
   href,
+  landingHref,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const experiment = getExperimentBySlug(slug);
   const Icon = experiment?.icon;
@@ -103,7 +106,7 @@ export default function ExperimentDetail({
           }}
         />
 
-        <Navbar activeIndex={5} />
+        <Navbar activeIndex={1} />
 
         <main className="mx-auto max-w-4xl px-4 sm:px-6 pt-24 sm:pt-32 pb-20 relative z-10">
           <motion.div
@@ -115,7 +118,7 @@ export default function ExperimentDetail({
             {/* Top Navigation */}
             <div className="flex items-center justify-between">
               <Link
-                href="/#experiments"
+                href="/?section=experiments"
                 className="inline-flex items-center gap-1.5 font-mono text-xs text-zinc-400 hover:text-white border border-dashed border-white/20 rounded-md px-3 py-1.5 bg-black/40 backdrop-blur-md transition-colors"
               >
                 <ArrowLeft size={13} />
@@ -230,18 +233,29 @@ export default function ExperimentDetail({
 
               {/* Action Bar */}
               <div className="pt-4 border-t border-dashed border-white/15 flex flex-wrap items-center justify-between gap-4">
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-[#FF5500] bg-[#FF5500] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-mono font-bold text-black hover:bg-[#ff6a1f] transition-all shadow-md"
-                >
-                  <span>[ VIEW REPOSITORY ON GITHUB ↗ ]</span>
-                  <ArrowUpRight size={14} />
-                </a>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg border border-[#FF5500] bg-[#FF5500] px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-mono font-bold text-black hover:bg-[#ff6a1f] transition-all shadow-md"
+                  >
+                    <span>[ VIEW REPOSITORY ON GITHUB ↗ ]</span>
+                    <ArrowUpRight size={14} />
+                  </a>
+
+                  {landingHref && (
+                    <Link
+                      href={landingHref}
+                      className="inline-flex items-center gap-2 rounded-lg border border-dashed border-white/25 bg-black/40 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-mono font-bold text-zinc-200 hover:border-[#A3E635] hover:text-[#A3E635] transition-all"
+                    >
+                      <span>[ VIEW LANDING PAGE ]</span>
+                    </Link>
+                  )}
+                </div>
 
                 <Link
-                  href="/#experiments"
+                  href="/?section=experiments"
                   className="font-mono text-xs text-zinc-400 hover:text-white transition-colors"
                 >
                   [ ← RETURN TO PROTOTYPES ]

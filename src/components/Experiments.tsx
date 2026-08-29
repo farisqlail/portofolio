@@ -208,13 +208,15 @@ export default function Experiments() {
 
               {/* Bottom Actions Bar */}
               <div className="pt-3 border-t border-dashed border-white/15 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 shrink-0">
-                <Link
-                  href={`/lab/${currentExp.slug}`}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#FF5500] bg-[#FF5500] px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-mono font-bold text-black hover:bg-[#ff6a1f] transition-all shadow-sm"
-                >
-                  <span>[ READ FULL SPECS ]</span>
-                  <ArrowRight size={12} />
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={currentExp.landingHref ?? `/lab/${currentExp.slug}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#FF5500] bg-[#FF5500] px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-mono font-bold text-black hover:bg-[#ff6a1f] transition-all shadow-sm"
+                  >
+                    <span>[ READ FULL SPECS ]</span>
+                    <ArrowRight size={12} />
+                  </Link>
+                </div>
 
                 <a
                   href={currentExp.href}

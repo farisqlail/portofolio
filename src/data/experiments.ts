@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Brain, Sparkles, Globe, Gamepad2 } from "lucide-react";
+import { Brain, Sparkles, Globe, Gamepad2, Bot } from "lucide-react";
 
 export interface Experiment {
   slug: string;
@@ -12,9 +12,31 @@ export interface Experiment {
   highlights: string[];
   icon: LucideIcon;
   href: string;
+  landingHref?: string;
 }
 
 export const experiments: Experiment[] = [
+  {
+    slug: "lail-hermes-agent",
+    title: "Lail Hermes",
+    description:
+      "Hermes is an autonomous AI developer, UI/UX designer, and task orchestrator for Windows, unifying Claude Code CLI, Antigravity, and Google Stitch MCP under one interface controlled via Telegram, web dashboard, or voice. Its Brain Layer routes chat, plans steps, and recalls semantic memory (RAG over an Obsidian vault) while Autonomous Engines run a dynamic cron scheduler, a Sentinel QA watchdog that detects code changes and reruns tests, and proactive routines like daily briefs and folder watching. Failures are classified before retry (rate limits, missing binaries, impossible plans, semantic errors) and repaired in bounded self-correction loops with a per-task spending cap. It builds APKs with automatic project-type detection (Flutter/React Native/Android), runs headless Playwright tests and Android emulator checks via adb, and does local object detection with TensorFlow.js coco-ssd. As a Windows tray app it supports global hotkeys, wake-word activation, and direct mic/camera access, with risky operations like git pushes or deletions gated behind explicit Telegram confirmation.",
+    summary:
+      "Autonomous AI developer, designer, and task orchestrator for Windows that unifies Claude Code, Antigravity, and Stitch MCP behind a Telegram/web/voice interface with self-scheduling agents and QA watchdogs.",
+    category: "AI / Agent Orchestration",
+    image: "/assets/images/lab/hermes/01-dashboard.png",
+    techStack: ["Python 3.11+", "React", "Three.js", "SQLite", "Obsidian RAG", "Claude Code CLI", "faster-whisper", "edge-tts", "Playwright"],
+    highlights: [
+      "Multi-channel control via Telegram bot, web dashboard, and voice (STT/TTS) with wake-word activation",
+      "Orchestrates Claude Code, Antigravity, and Stitch MCP with NVIDIA NIM/DeepSeek for planning",
+      "Autonomous cron scheduler + Sentinel QA watchdog that detects changes and reruns tests",
+      "Semantic memory via Obsidian vault RAG, with failure-classified retry and bounded repair loops",
+      "APK builds with Flutter/React Native/Android auto-detection, Playwright + adb emulator testing",
+    ],
+    icon: Bot,
+    href: "https://github.com/farisqlail/lail-hermes-agent",
+    landingHref: "/hermes",
+  },
   {
     slug: "ai-code-review-assistant",
     title: "AI Code Review Assistant",

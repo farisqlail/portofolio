@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { Geist, Geist_Mono } from "next/font/google";
 import Head from "next/head";
 import Navbar from "@/components/Navbar";
@@ -25,6 +26,7 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const cards: DeckCardItem[] = [
@@ -37,11 +39,27 @@ export default function Home() {
       component: <HeroSection />,
     },
     {
+      id: "experiments",
+      tag: "Lab",
+      title: "Open-Source Prototypes & Systems",
+      label: "Lab",
+      num: "02",
+      component: <Experiments />,
+    },
+    {
+      id: "experience",
+      tag: "Experience",
+      title: "Production Career Timeline",
+      label: "Experience",
+      num: "03",
+      component: <Experience />,
+    },
+    {
       id: "about",
       tag: "Philosophy",
       title: "Architecture & Methodology",
       label: "Philosophy",
-      num: "02",
+      num: "04",
       component: <About />,
     },
     {
@@ -49,32 +67,16 @@ export default function Home() {
       tag: "Capabilities",
       title: "Production Tech Stack",
       label: "Capabilities",
-      num: "03",
+      num: "05",
       component: <Skills />,
-    },
-    {
-      id: "experience",
-      tag: "Experience",
-      title: "Production Career Timeline",
-      label: "Experience",
-      num: "04",
-      component: <Experience />,
     },
     {
       id: "certifications",
       tag: "Honors",
       title: "Competition Awards & Credentials",
       label: "Honors",
-      num: "05",
-      component: <Certifications />,
-    },
-    {
-      id: "experiments",
-      tag: "Lab",
-      title: "Open-Source Prototypes & Systems",
-      label: "Lab",
       num: "06",
-      component: <Experiments />,
+      component: <Certifications />,
     },
     {
       id: "contact",
@@ -85,6 +87,16 @@ export default function Home() {
       component: <Contact onSelectCard={setActiveIndex} />,
     },
   ];
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const section = router.query.section;
+    if (typeof section !== "string") return;
+
+    const index = cards.findIndex((card) => card.id === section);
+    if (index !== -1) setActiveIndex(index);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.query.section]);
 
   return (
     <>
