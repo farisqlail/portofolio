@@ -10,8 +10,8 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://laildev.vercel.app/";
 const REPO_URL = "https://github.com/farisqlail/lail-hermes-agent";
 
-const driveDownload = (fileId: string) =>
-  `https://drive.google.com/uc?export=download&id=${fileId}`;
+const releaseAsset = (tag: string, file: string) =>
+  `${REPO_URL}/releases/download/${tag}/${file}`;
 
 const releases = [
   {
@@ -22,12 +22,12 @@ const releases = [
       {
         label: "Installer (.exe)",
         detail: "Single-file installer, guided setup",
-        href: driveDownload("1Oyb6_G7iAXv13Nbu1RBC14HFVGc6Y08Q"),
+        href: releaseAsset("v0.0.1", "Lail.Hermes.0.0.1.exe"),
       },
       {
         label: "Setup Package",
         detail: "Full setup bundle",
-        href: driveDownload("1ZrZK5lU2hpUrkToT_vZVT0s0PAb7lMmu"),
+        href: releaseAsset("v0.0.1", "Lail.Hermes.Setup.0.0.1.exe"),
       },
     ],
   },
@@ -43,6 +43,7 @@ export default function HermesDownloads() {
         <title>Downloads · Lail Hermes</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={pageUrl} />
+        <link rel="icon" href="/assets/icons/logo.png" type="image/png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={pageUrl} />
         <meta property="og:title" content="Downloads · Lail Hermes" />
@@ -110,8 +111,8 @@ export default function HermesDownloads() {
 
           {/* Release notice */}
           <div className="rounded-lg border border-dashed border-[#A3E635]/40 bg-[#A3E635]/5 px-4 py-3 font-mono text-[11px] text-zinc-300 text-center">
-            Files are hosted on Google Drive. Drive may show a virus-scan warning on large files —
-            choose &ldquo;download anyway&rdquo; to continue.
+            Files are hosted on GitHub Releases. Windows SmartScreen may warn on the unsigned build —
+            choose &ldquo;More info&rdquo; → &ldquo;Run anyway&rdquo; to continue.
           </div>
 
           {/* Releases */}

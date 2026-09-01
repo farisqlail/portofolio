@@ -145,6 +145,7 @@ export default function HermesLanding() {
         <title>Lail Hermes · Autonomous AI Dev Agent for Windows</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={pageUrl} />
+        <link rel="icon" href="/assets/icons/logo.png" type="image/png" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={pageUrl} />
         <meta property="og:title" content="Lail Hermes · Autonomous AI Dev Agent for Windows" />
