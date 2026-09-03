@@ -237,7 +237,7 @@ export default function HermesLanding() {
               </a>
             </div>
             <p className="font-mono text-[11px] text-zinc-500">
-              v0.0.1 &mdash; installer and setup builds for Windows.
+              Latest build &mdash; installer and setup packages for Windows.
             </p>
           </section>
 
@@ -414,7 +414,7 @@ export default function HermesLanding() {
           <section className="rounded-2xl border border-dashed border-white/20 bg-[#0c0c12]/95 p-8 sm:p-10 text-center space-y-4">
             <h2 className="text-xl sm:text-2xl font-bold text-white">Run Hermes on your own machine.</h2>
             <p className="text-sm text-zinc-400 max-w-xl mx-auto">
-              Free and open source. Clone the repo, or grab the Windows build (v0.0.1).
+              Free and open source. Clone the repo, or grab the latest Windows build.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link

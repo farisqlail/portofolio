@@ -1,4 +1,5 @@
 import Head from "next/head";
+import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -8,34 +9,54 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://laildev.vercel.app/";
-const REPO_URL = "https://github.com/farisqlail/lail-hermes-agent";
+const REPO_SLUG = "farisqlail/lail-hermes-agent";
+const REPO_URL = `https://github.com/${REPO_SLUG}`;
 
-const releaseAsset = (tag: string, file: string) =>
-  `${REPO_URL}/releases/download/${tag}/${file}`;
+const LATEST_URL = `${REPO_URL}/releases/latest`;
 
-const releases = [
+type Artifact = { label: string; detail: string; href: string };
+
+const ARTIFACT_SPECS = [
   {
-    version: "0.0.1",
-    latest: true,
-    notes: "Initial public build. Windows tray app with Telegram, web dashboard, and voice control.",
-    artifacts: [
-      {
-        label: "Installer (.exe)",
-        detail: "Single-file installer, guided setup",
-        href: releaseAsset("v0.0.1", "Lail.Hermes.0.0.1.exe"),
-      },
-      {
-        label: "Setup Package",
-        detail: "Full setup bundle",
-        href: releaseAsset("v0.0.1", "Lail.Hermes.Setup.0.0.1.exe"),
-      },
-    ],
+    label: "Installer (.exe)",
+    detail: "Single-file installer, guided setup",
+    match: (name: string) => /^Lail\.Hermes\.\d/.test(name),
+  },
+  {
+    label: "Setup Package",
+    detail: "Full setup bundle",
+    match: (name: string) => /^Lail\.Hermes\.Setup\./.test(name),
   },
 ];
 
-export default function HermesDownloads() {
+export const getStaticProps = (async () => {
+  let assets: { name: string; browser_download_url: string; size: number }[] = [];
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO_SLUG}/releases/latest`, {
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (res.ok) assets = (await res.json()).assets ?? [];
+  } catch {
+    // fall through to the releases page link below
+  }
+
+  const artifacts: Artifact[] = ARTIFACT_SPECS.map((spec) => {
+    const asset = assets.find((a) => spec.match(a.name));
+    return {
+      label: spec.label,
+      detail: asset ? `${spec.detail} · ${Math.round(asset.size / 1_048_576)} MB` : spec.detail,
+      href: asset?.browser_download_url ?? LATEST_URL,
+    };
+  });
+
+  // ponytail: rebuilt hourly; add an on-demand revalidate webhook if releases need to show up instantly
+  return { props: { artifacts }, revalidate: 3600 };
+}) satisfies GetStaticProps<{ artifacts: Artifact[] }>;
+
+export default function HermesDownloads({ artifacts }: InferGetStaticPropsType<typeof getStaticProps>) {
   const pageUrl = `${SITE_URL}hermes/downloads`;
-  const description = "Download Lail Hermes for Windows — installer and setup builds, versioned releases.";
+  const description = "Download Lail Hermes for Windows — always the latest installer and setup build.";
 
   return (
     <>
@@ -116,59 +137,46 @@ export default function HermesDownloads() {
           </div>
 
           {/* Releases */}
-          <section className="space-y-5">
-            {releases.map((release) => (
-              <div
-                key={release.version}
-                className="rounded-2xl border border-dashed border-white/20 bg-[#0c0c12]/95 p-6 sm:p-8 space-y-5"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-white/15 pb-4">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-lg sm:text-xl font-bold text-white">
-                      v{release.version}
-                    </span>
-                    {release.latest && (
-                      <span className="rounded border border-[#FF5500]/40 bg-[#FF5500]/10 px-2 py-0.5 font-mono text-[10px] text-[#FF5500] font-bold">
-                        LATEST
-                      </span>
-                    )}
-                  </div>
-                  <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
-                    WINDOWS x64
-                  </span>
-                </div>
-
-                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans">
-                  {release.notes}
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {release.artifacts.map((artifact) => (
-                    <a
-                      key={artifact.label}
-                      href={artifact.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center justify-between gap-3 rounded-xl border border-dashed border-white/15 bg-black/50 p-4 hover:border-[#FF5500]/60 hover:bg-[#FF5500]/5 transition-all"
-                    >
-                      <div className="flex items-start gap-3 min-w-0">
-                        <FileArchive size={18} className="text-[#A3E635] shrink-0 mt-0.5" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-bold text-white group-hover:text-[#FF5500] transition-colors">
-                            {artifact.label}
-                          </p>
-                          <p className="text-[11px] text-zinc-500 truncate">{artifact.detail}</p>
-                        </div>
-                      </div>
-                      <Download
-                        size={16}
-                        className="text-zinc-400 shrink-0 group-hover:text-[#FF5500] transition-colors"
-                      />
-                    </a>
-                  ))}
-                </div>
+          <section>
+            <div className="rounded-2xl border border-dashed border-white/20 bg-[#0c0c12]/95 p-6 sm:p-8 space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-white/15 pb-4">
+                <span className="font-mono text-lg sm:text-xl font-bold text-white">Latest build</span>
+                <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
+                  WINDOWS x64
+                </span>
               </div>
-            ))}
+
+              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans">
+                Links always point at the newest release — Windows tray app with Telegram, web
+                dashboard, and voice control.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {artifacts.map((artifact) => (
+                  <a
+                    key={artifact.label}
+                    href={artifact.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between gap-3 rounded-xl border border-dashed border-white/15 bg-black/50 p-4 hover:border-[#FF5500]/60 hover:bg-[#FF5500]/5 transition-all"
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <FileArchive size={18} className="text-[#A3E635] shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-white group-hover:text-[#FF5500] transition-colors">
+                          {artifact.label}
+                        </p>
+                        <p className="text-[11px] text-zinc-500 truncate">{artifact.detail}</p>
+                      </div>
+                    </div>
+                    <Download
+                      size={16}
+                      className="text-zinc-400 shrink-0 group-hover:text-[#FF5500] transition-colors"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
           </section>
 
           {/* What you get */}
