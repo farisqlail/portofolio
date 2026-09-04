@@ -24,7 +24,7 @@ export const experiments: Experiment[] = [
     summary:
       "Autonomous AI developer, designer, and task orchestrator for Windows that unifies Claude Code, Antigravity, and Stitch MCP behind a Telegram/web/voice interface with self-scheduling agents and QA watchdogs.",
     category: "AI / Agent Orchestration",
-    image: "/assets/images/lab/hermes/01-dashboard.png",
+    image: "/assets/images/lab/hermes/lail-hermes.jpeg",
     techStack: ["Python 3.11+", "React", "Three.js", "SQLite", "Obsidian RAG", "Claude Code CLI", "faster-whisper", "edge-tts", "Playwright"],
     highlights: [
       "Multi-channel control via Telegram bot, web dashboard, and voice (STT/TTS) with wake-word activation",

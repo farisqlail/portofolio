@@ -37,7 +37,7 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
         >
           <div className="flex items-center gap-1.5 rounded border border-[#FF5500]/40 bg-[#FF5500]/10 px-2.5 py-1 font-mono text-[11px] font-bold text-[#FF5500] tracking-wider uppercase transition-colors group-hover:border-[#FF5500] group-hover:bg-[#FF5500]/20">
             <span className="h-1.5 w-1.5 bg-[#FF5500]" />
-            <span>FR-ENG</span>
+            <span>ID-SBY</span>
           </div>
           <div className="hidden sm:flex flex-col">
             <span className="font-mono text-xs font-bold text-white tracking-tight group-hover:text-[#FF5500] transition-colors">

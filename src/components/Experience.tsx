@@ -12,16 +12,6 @@ interface ExperienceItem {
 
 const experiences: ExperienceItem[] = [
   {
-    role: "Mobile Developer",
-    company: "KirimFresh.id",
-    type: "Part-time",
-    period: "Sep 2025 - Present",
-    status: "ACTIVE",
-    description:
-      "Building and maintaining mobile applications for the KirimFresh logistics platform with real-time tracking and offline-first state handling.",
-    technologies: ["React Native", "iOS", "Android", "REST APIs"],
-  },
-  {
     role: "Product Lead",
     company: "InterActive Technologies Corp",
     type: "Full-time · On-site",
@@ -40,6 +30,16 @@ const experiences: ExperienceItem[] = [
     description:
       "Built responsive web applications in Next.js and TypeScript, integrating backend REST APIs and optimizing frontend load performance.",
     technologies: ["React", "TypeScript", "Next.js", "Tailwind CSS"],
+  },
+  {
+    role: "Mobile Developer",
+    company: "KirimFresh.id",
+    type: "Part-time",
+    period: "Sep 2025 - Aug 2026",
+    status: "COMPLETED",
+    description:
+      "Building and maintaining mobile applications for the KirimFresh logistics platform with real-time tracking and offline-first state handling.",
+    technologies: ["React Native", "iOS", "Android", "REST APIs"],
   },
   {
     role: "Junior Front End Web Developer",

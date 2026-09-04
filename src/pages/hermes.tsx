@@ -245,7 +245,7 @@ export default function HermesLanding() {
           <section className="space-y-3">
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-dashed border-white/20 bg-zinc-900 shadow-2xl">
               <Image
-                src="/assets/images/lab/hermes/01-dashboard.png"
+                src="/assets/images/lab/hermes/lail-hermes.jpeg"
                 alt="Lail Hermes web dashboard"
                 fill
                 priority
