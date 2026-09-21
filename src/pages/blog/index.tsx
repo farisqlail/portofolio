@@ -1,4 +1,4 @@
-﻿import { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -106,26 +106,16 @@ export default function BlogIndex({
               <span>[ FIELD NOTES &amp; ARCHITECTURE SPECS ]</span>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-                  Engineering Notes &amp;{" "}
-                  <span className="text-[#FF5500] underline decoration-dashed decoration-[#FF5500]/50 underline-offset-8">
-                    Field Logs.
-                  </span>
-                </h1>
-                <p className="mt-2 text-xs sm:text-base text-zinc-400 max-w-2xl leading-relaxed">
-                  Deep-dives into scalable software architectures, distributed backend APIs, Next.js performance, and autonomous AI systems.
-                </p>
-              </div>
-
-              {/* Admin Access Indicator */}
-              <Link
-                href="/admin"
-                className="self-start md:self-auto inline-flex items-center gap-1.5 rounded border border-dashed border-white/20 bg-black/40 px-3 py-1.5 font-mono text-xs text-zinc-400 hover:text-white hover:border-[#FF5500] transition-colors"
-              >
-                <span>[ BACKOFFICE CMS ↗ ]</span>
-              </Link>
+            <div>
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
+                Engineering Notes &amp;{" "}
+                <span className="text-[#FF5500] underline decoration-dashed decoration-[#FF5500]/50 underline-offset-8">
+                  Field Logs.
+                </span>
+              </h1>
+              <p className="mt-2 text-xs sm:text-base text-zinc-400 max-w-2xl leading-relaxed">
+                Deep-dives into scalable software architectures, distributed backend APIs, Next.js performance, and autonomous AI systems.
+              </p>
             </div>
           </div>
 
