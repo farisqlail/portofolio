@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 
@@ -18,12 +19,28 @@ const navLinks = [
   { label: "Contact", num: "07", index: 6 },
 ];
 
+const sectionIds = [
+  "hero",
+  "experiments",
+  "experience",
+  "about",
+  "skills",
+  "certifications",
+  "contact",
+];
+
 export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isBlog = router.pathname.startsWith("/blog");
+  const effectiveActiveIndex = isBlog ? -1 : activeIndex;
 
   const handleNavClick = (index: number) => {
     if (onSelectCard) {
       onSelectCard(index);
+    } else {
+      router.push(`/?section=${sectionIds[index] || "hero"}`);
     }
     setMobileOpen(false);
   };
@@ -53,7 +70,7 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
         {/* Floating Stitch Pill Nav */}
         <nav className="hidden md:flex items-center gap-1 rounded-full border border-dashed border-white/20 bg-black/80 p-1 backdrop-blur-xl shadow-2xl">
           {navLinks.map((link) => {
-            const isActive = activeIndex === link.index;
+            const isActive = effectiveActiveIndex === link.index;
             return (
               <button
                 key={link.label}
@@ -81,7 +98,11 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
         <div className="hidden md:flex items-center gap-2">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-[#FF5500]/40 bg-[#FF5500]/10 px-3 py-1.5 font-mono text-xs text-[#FF5500] font-bold transition-all hover:bg-[#FF5500] hover:text-black backdrop-blur-md cursor-pointer shadow-sm"
+            className={`inline-flex items-center gap-1.5 rounded-md border border-dashed px-3 py-1.5 font-mono text-xs font-bold transition-all backdrop-blur-md cursor-pointer shadow-sm ${
+              isBlog
+                ? "border-[#FF5500] bg-[#FF5500] text-black shadow-sm"
+                : "border-[#FF5500]/40 bg-[#FF5500]/10 text-[#FF5500] hover:bg-[#FF5500] hover:text-black"
+            }`}
           >
             <span>[ BLOG ]</span>
           </Link>
@@ -119,7 +140,7 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
                   key={link.label}
                   onClick={() => handleNavClick(link.index)}
                   className={`text-left rounded-lg px-3 py-2 transition-colors flex items-center justify-between ${
-                    activeIndex === link.index
+                    effectiveActiveIndex === link.index
                       ? "bg-[#FF5500] text-black font-bold"
                       : "text-zinc-300 hover:bg-white/5 hover:text-white"
                   }`}
@@ -131,10 +152,17 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
               <div className="mt-2 pt-2 border-t border-dashed border-white/15 space-y-1.5">
                 <Link
                   href="/blog"
-                  className="flex w-full items-center justify-between rounded-lg border border-dashed border-[#FF5500]/40 bg-[#FF5500]/10 px-3 py-2 text-xs font-bold text-[#FF5500] font-mono shadow-sm"
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex w-full items-center justify-between rounded-lg border border-dashed px-3 py-2 text-xs font-bold font-mono shadow-sm ${
+                    isBlog
+                      ? "border-[#FF5500] bg-[#FF5500] text-black"
+                      : "border-[#FF5500]/40 bg-[#FF5500]/10 text-[#FF5500]"
+                  }`}
                 >
                   <span>[ BLOG &amp; FIELD NOTES ]</span>
-                  <span className="text-[9px] bg-[#FF5500] text-black px-1.5 py-0.5 rounded">NEW</span>
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded ${isBlog ? "bg-black text-[#FF5500]" : "bg-[#FF5500] text-black"}`}>
+                    {isBlog ? "ACTIVE" : "NEW"}
+                  </span>
                 </Link>
                 <button
                   onClick={() => handleNavClick(6)}
