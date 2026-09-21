@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -17,7 +17,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdSlot from "@/components/ads/AdSlot";
-import { getPublishedPosts } from "@/lib/blogData";
+import { getPublishedPosts, getLiveViewCounts } from "@/lib/blogData";
 import type { BlogPost } from "@/types/blog";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -46,6 +46,15 @@ export default function BlogIndex({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [liveViews, setLiveViews] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    getLiveViewCounts().then((counts) => {
+      if (counts && Object.keys(counts).length > 0) {
+        setLiveViews(counts);
+      }
+    });
+  }, []);
 
   const categories = useMemo(() => {
     const cats = new Set(posts.map((p) => p.category));
@@ -234,7 +243,7 @@ export default function BlogIndex({
                           <span>·</span>
                           <span className="flex items-center gap-1 text-[#A3E635]">
                             <Eye size={11} />
-                            {post.view_count} views
+                            {liveViews[post.slug] !== undefined ? liveViews[post.slug] : post.view_count} views
                           </span>
                         </div>
 

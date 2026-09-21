@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -19,7 +19,12 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdSlot from "@/components/ads/AdSlot";
-import { getPublishedPosts, getPostBySlug, incrementPostViews } from "@/lib/blogData";
+import {
+  getPublishedPosts,
+  getPostBySlug,
+  incrementPostViews,
+  getPostViewCount,
+} from "@/lib/blogData";
 import type { BlogPost } from "@/types/blog";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -72,12 +77,32 @@ export default function BlogPostDetail({
   renderedHtml,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [copied, setCopied] = useState(false);
+  const [views, setViews] = useState(post.view_count || 0);
   const readTime = estimateReadingTime(post.content);
   const pageUrl = `${SITE_URL}blog/${post.slug}`;
 
   useEffect(() => {
-    // Increment view count on mount
-    incrementPostViews(post.slug);
+    // 1. Check if user already viewed this post in current browser session
+    const sessionKey = `viewed_post_${post.slug}`;
+    const alreadyViewed =
+      typeof window !== "undefined" ? sessionStorage.getItem(sessionKey) : null;
+
+    if (!alreadyViewed) {
+      // New visit: increment in Supabase and update on screen
+      incrementPostViews(post.slug).then((newCount) => {
+        if (typeof newCount === "number") {
+          setViews(newCount);
+          sessionStorage.setItem(sessionKey, "1");
+        }
+      });
+    } else {
+      // Returning in same session: fetch latest real count without duplicate increment
+      getPostViewCount(post.slug).then((currentCount) => {
+        if (typeof currentCount === "number") {
+          setViews(currentCount);
+        }
+      });
+    }
   }, [post.slug]);
 
   const handleCopyLink = () => {
@@ -183,7 +208,7 @@ export default function BlogPostDetail({
                   <span>·</span>
                   <span className="flex items-center gap-1.5 text-[#A3E635]">
                     <Eye size={13} />
-                    {post.view_count} views
+                    {views} views
                   </span>
                 </div>
 

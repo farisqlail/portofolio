@@ -1,4 +1,4 @@
-﻿import { supabase, isSupabaseConfigured } from "./supabaseClient";
+import { supabase, isSupabaseConfigured } from "./supabaseClient";
 import type { BlogPost } from "@/types/blog";
 
 export const SAMPLE_POSTS: BlogPost[] = [
@@ -50,7 +50,7 @@ Relational databases like PostgreSQL thrive when indexing matches real query pat
     category: "Architecture",
     tags: ["Laravel", "Node.js", "Redis", "Microservices"],
     status: "published",
-    view_count: 342,
+    view_count: 0,
     published_at: "2026-09-15T08:00:00Z",
     created_at: "2026-09-15T08:00:00Z",
     updated_at: "2026-09-15T08:00:00Z",
@@ -94,7 +94,7 @@ By eliminating dead Three.js boilerplate and streamlining dependencies, our tota
     category: "Engineering",
     tags: ["Next.js", "React 19", "Turbopack", "Performance"],
     status: "published",
-    view_count: 512,
+    view_count: 0,
     published_at: "2026-09-18T10:30:00Z",
     created_at: "2026-09-18T10:30:00Z",
     updated_at: "2026-09-18T10:30:00Z",
@@ -133,7 +133,7 @@ Each agent produces an immutable artifact that must be validated by the subseque
     category: "AI & ML",
     tags: ["AI", "Multi-Agent", "Llama 3.3", "Groq"],
     status: "published",
-    view_count: 289,
+    view_count: 0,
     published_at: "2026-09-20T14:15:00Z",
     created_at: "2026-09-20T14:15:00Z",
     updated_at: "2026-09-20T14:15:00Z",
@@ -185,12 +185,61 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   }
 }
 
-export async function incrementPostViews(slug: string): Promise<void> {
-  if (!isSupabaseConfigured) return;
+export async function incrementPostViews(slug: string): Promise<number | null> {
+  if (!isSupabaseConfigured) return null;
 
   try {
+    // 1. Call RPC to increment view count securely
     await supabase.rpc("increment_post_views", { post_slug: slug });
+
+    // 2. Fetch fresh real view_count from Supabase
+    const { data } = await supabase
+      .from("posts")
+      .select("view_count")
+      .eq("slug", slug)
+      .single();
+
+    return data?.view_count ?? null;
   } catch {
-    // Non-blocking view increment
+    return null;
   }
 }
+
+export async function getLiveViewCounts(): Promise<Record<string, number>> {
+  if (!isSupabaseConfigured) return {};
+
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select("slug, view_count")
+      .eq("status", "published");
+
+    if (error || !data) return {};
+
+    const map: Record<string, number> = {};
+    data.forEach((p) => {
+      map[p.slug] = p.view_count;
+    });
+    return map;
+  } catch {
+    return {};
+  }
+}
+
+export async function getPostViewCount(slug: string): Promise<number | null> {
+  if (!isSupabaseConfigured) return null;
+
+  try {
+    const { data } = await supabase
+      .from("posts")
+      .select("view_count")
+      .eq("slug", slug)
+      .single();
+
+    return data?.view_count ?? null;
+  } catch {
+    return null;
+  }
+}
+
+
