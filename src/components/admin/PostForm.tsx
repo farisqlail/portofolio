@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { marked } from "marked";
 import {
   Save,
   ArrowLeft,
   Upload,
-  Eye,
-  Edit3,
-  Sparkles,
   AlertCircle,
-  Check,
 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import type { BlogPost, PostFormData, PostStatus } from "@/types/blog";
+import WysiwygEditor from "./WysiwygEditor";
 
 interface PostFormProps {
   initialData?: BlogPost;
@@ -40,17 +36,9 @@ export default function PostForm({ initialData, isEdit = false }: PostFormProps)
   const [category, setCategory] = useState(initialData?.category ?? "Engineering");
   const [tagsInput, setTagsInput] = useState(initialData?.tags?.join(", ") ?? "");
   const [status, setStatus] = useState<PostStatus>(initialData?.status ?? "draft");
-  const [previewTab, setPreviewTab] = useState<"edit" | "preview">("edit");
-  const [parsedPreviewHtml, setParsedPreviewHtml] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (previewTab === "preview") {
-      Promise.resolve(marked.parse(content)).then((html) => setParsedPreviewHtml(html));
-    }
-  }, [previewTab, content]);
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -250,53 +238,19 @@ export default function PostForm({ initialData, isEdit = false }: PostFormProps)
             />
           </div>
 
-          {/* Content Markdown with Tab Switch */}
+          {/* Content WYSIWYG Editor */}
           <div className="space-y-2 font-mono text-xs">
             <div className="flex items-center justify-between border-b border-dashed border-white/15 pb-2">
-              <label className="text-zinc-400 font-bold">[ CONTENT (MARKDOWN) ]</label>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setPreviewTab("edit")}
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] cursor-pointer ${
-                    previewTab === "edit"
-                      ? "border border-[#FF5500] bg-[#FF5500] text-black font-bold"
-                      : "border border-dashed border-white/15 text-zinc-400"
-                  }`}
-                >
-                  <Edit3 size={11} />
-                  <span>EDIT</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPreviewTab("preview")}
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] cursor-pointer ${
-                    previewTab === "preview"
-                      ? "border border-[#FF5500] bg-[#FF5500] text-black font-bold"
-                      : "border border-dashed border-white/15 text-zinc-400"
-                  }`}
-                >
-                  <Eye size={11} />
-                  <span>PREVIEW</span>
-                </button>
-              </div>
+              <label className="text-zinc-400 font-bold">[ ARTICLE_CONTENT (WYSIWYG) ]</label>
+              <span className="text-[10px] text-zinc-500 font-normal">
+                RICH TEXT + VISUAL FORMATTING
+              </span>
             </div>
-
-            {previewTab === "edit" ? (
-              <textarea
-                required
-                rows={16}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your article in Markdown syntax... Supports # headings, ```code blocks, - lists, tables."
-                className="w-full rounded-lg border border-dashed border-white/15 bg-black/60 p-3.5 font-mono text-xs leading-relaxed text-zinc-200 placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-              />
-            ) : (
-              <div
-                className="w-full min-h-[350px] rounded-lg border border-dashed border-white/15 bg-[#09090e] p-5 prose prose-invert max-w-none text-xs leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: parsedPreviewHtml }}
-              />
-            )}
+            <WysiwygEditor
+              value={content}
+              onChange={(newVal) => setContent(newVal)}
+              placeholder="Start drafting your article... Supports rich visual formatting, code blocks, lists, and images."
+            />
           </div>
         </div>
 
