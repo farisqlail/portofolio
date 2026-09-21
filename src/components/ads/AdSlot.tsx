@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface AdSlotProps {
   slotId?: string;
@@ -6,7 +6,8 @@ interface AdSlotProps {
   className?: string;
 }
 
-const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+const ADSENSE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-2826613999405385";
 
 export default function AdSlot({
   slotId = "default-slot",
@@ -36,43 +37,25 @@ export default function AdSlot({
     "in-article": "min-h-[100px] w-full",
   }[format];
 
-  // If AdSense client ID is configured, render the real AdSense tag
-  if (ADSENSE_CLIENT_ID && process.env.NODE_ENV === "production") {
-    return (
-      <div className={`my-6 flex flex-col items-center justify-center overflow-hidden ${className}`}>
-        <span className="mb-1 font-mono text-[9px] uppercase tracking-wider text-zinc-600">
-          [ SPONSORED / ADVERTISEMENT ]
-        </span>
-        <div ref={adRef} className={`overflow-hidden rounded border border-dashed border-white/10 bg-black/40 ${formatStyles}`}>
-          <ins
-            className="adsbygoogle"
-            style={{ display: "block", textAlign: "center" }}
-            data-ad-client={ADSENSE_CLIENT_ID}
-            data-ad-slot={slotId}
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          />
-        </div>
-      </div>
-    );
-  }
+  const isNumericSlot = slotId && /^\d+$/.test(slotId);
 
-  // Development & Fallback placeholder with Stitch UI style
   return (
-    <div className={`my-6 flex flex-col items-center justify-center ${className}`}>
+    <div className={`my-6 flex flex-col items-center justify-center overflow-hidden ${className}`}>
       <span className="mb-1 font-mono text-[9px] uppercase tracking-wider text-zinc-600">
-        [ ADVERTISEMENT SLOT // {format.toUpperCase()} ]
+        [ SPONSORED / ADVERTISEMENT ]
       </span>
       <div
-        className={`flex flex-col items-center justify-center rounded-lg border border-dashed border-white/15 bg-[#09090e]/80 p-4 text-center backdrop-blur-sm ${formatStyles}`}
+        ref={adRef}
+        className={`overflow-hidden rounded border border-dashed border-white/10 bg-black/40 ${formatStyles}`}
       >
-        <div className="flex items-center gap-1.5 font-mono text-[10px] text-[#FF5500]">
-          <span className="h-1.5 w-1.5 bg-[#FF5500]" />
-          <span>ADSENSE_CONTAINER // {slotId}</span>
-        </div>
-        <p className="mt-1 font-mono text-[10px] text-zinc-500">
-          Active AdSense Slot · Ready for Publisher ID
-        </p>
+        <ins
+          className="adsbygoogle"
+          style={{ display: "block", textAlign: "center" }}
+          data-ad-client={ADSENSE_CLIENT_ID}
+          {...(isNumericSlot ? { "data-ad-slot": slotId } : {})}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        />
       </div>
     </div>
   );
