@@ -273,4 +273,19 @@ html {
   will-change: transform;
 }
 
+/* Google AdSense Dark Blueprint Theme Integration */
+ins.adsbygoogle {
+  background: transparent !important;
+}
+
+ins.adsbygoogle iframe {
+  background-color: transparent !important;
+}
+
+/* Collapse unfilled ad element to eliminate blank white boxes */
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
+
+
 
