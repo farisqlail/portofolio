@@ -11,20 +11,21 @@ interface BlogCoverImageProps {
 }
 
 export const DEFAULT_CATEGORY_COVERS: Record<string, string> = {
-  Architecture: "/assets/images/lab/ai-code-review.jpg",
-  Engineering: "/assets/images/lab/ai-agents.jpg",
-  "AI & ML": "/assets/images/lab/simple-wallet.jpg",
-  Web3: "/assets/images/lab/simple-wallet.jpg",
-  Leadership: "/assets/images/lab/brongwood.jpg",
+  Engineering: "/assets/images/categories/engineering.jpg",
+  Architecture: "/assets/images/categories/architecture.jpg",
+  "AI & ML": "/assets/images/categories/ai-ml.jpg",
+  Web3: "/assets/images/categories/web3.jpg",
+  Leadership: "/assets/images/categories/leadership.jpg",
 };
 
-export const FALLBACK_DEFAULT_COVER = "/assets/images/lab/ai-code-review.jpg";
+export const FALLBACK_DEFAULT_COVER = "/assets/images/categories/engineering.jpg";
 
 export function getDefaultCover(category?: string): string {
-  if (category && DEFAULT_CATEGORY_COVERS[category]) {
-    return DEFAULT_CATEGORY_COVERS[category];
-  }
-  return FALLBACK_DEFAULT_COVER;
+  if (!category) return FALLBACK_DEFAULT_COVER;
+  const match = Object.entries(DEFAULT_CATEGORY_COVERS).find(
+    ([k]) => k.toLowerCase() === category.trim().toLowerCase()
+  );
+  return match ? match[1] : FALLBACK_DEFAULT_COVER;
 }
 
 export default function BlogCoverImage({
