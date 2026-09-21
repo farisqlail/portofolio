@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 
@@ -77,10 +78,16 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
         </nav>
 
         {/* Right CTA */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-[#FF5500]/40 bg-[#FF5500]/10 px-3 py-1.5 font-mono text-xs text-[#FF5500] font-bold transition-all hover:bg-[#FF5500] hover:text-black backdrop-blur-md cursor-pointer shadow-sm"
+          >
+            <span>[ BLOG ]</span>
+          </Link>
           <button
             onClick={() => handleNavClick(6)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-white/25 bg-black/60 px-3.5 py-1.5 font-mono text-xs text-zinc-300 transition-all hover:border-[#FF5500] hover:text-[#FF5500] hover:bg-[#FF5500]/10 backdrop-blur-md cursor-pointer shadow-sm"
+            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-white/25 bg-black/60 px-3.5 py-1.5 font-mono text-xs text-zinc-300 transition-all hover:border-white hover:text-white hover:bg-white/10 backdrop-blur-md cursor-pointer shadow-sm"
           >
             <span>[ CONTACT ]</span>
             <ArrowUpRight size={12} />
@@ -121,10 +128,17 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
                   <span className="text-[10px] opacity-60">[{link.num}]</span>
                 </button>
               ))}
-              <div className="mt-2 pt-2 border-t border-dashed border-white/15">
+              <div className="mt-2 pt-2 border-t border-dashed border-white/15 space-y-1.5">
+                <Link
+                  href="/blog"
+                  className="flex w-full items-center justify-between rounded-lg border border-dashed border-[#FF5500]/40 bg-[#FF5500]/10 px-3 py-2 text-xs font-bold text-[#FF5500] font-mono shadow-sm"
+                >
+                  <span>[ BLOG &amp; FIELD NOTES ]</span>
+                  <span className="text-[9px] bg-[#FF5500] text-black px-1.5 py-0.5 rounded">NEW</span>
+                </Link>
                 <button
                   onClick={() => handleNavClick(6)}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#FF5500] bg-[#FF5500] py-2 text-xs font-bold text-black font-mono shadow-sm"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 bg-zinc-900 py-2 text-xs font-bold text-white font-mono shadow-sm"
                 >
                   <span>[ CONTACT DIRECTLY ]</span>
                   <ArrowUpRight size={13} />

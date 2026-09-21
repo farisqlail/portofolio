@@ -100,6 +100,13 @@ export default function Contact({ onSelectCard }: ContactProps) {
                 {link.label}
               </button>
             ))}
+            <a
+              href="/blog"
+              className="text-left text-[#FF5500] hover:underline transition-colors flex items-center gap-1 font-bold"
+            >
+              <span>07 Blog &amp; Notes</span>
+              <span className="text-[9px] bg-[#FF5500]/20 px-1 rounded">NEW</span>
+            </a>
           </div>
         </div>
 
