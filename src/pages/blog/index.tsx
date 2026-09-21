@@ -17,6 +17,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdSlot from "@/components/ads/AdSlot";
+import BlogCoverImage from "@/components/blog/BlogCoverImage";
 import { getPublishedPosts, getLiveViewCounts } from "@/lib/blogData";
 import type { BlogPost } from "@/types/blog";
 
@@ -206,26 +207,23 @@ export default function BlogIndex({
                     </span>
 
                     <div>
-                      {/* Thumbnail Cover */}
-                      {post.cover_image && (
-                        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-dashed border-white/15 bg-zinc-950">
-                          <Image
-                            src={post.cover_image}
-                            alt={post.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            className="object-cover object-top transition-transform duration-500 group-hover:scale-103"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      {/* Thumbnail Cover with Guaranteed Default Fallback */}
+                      <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-dashed border-white/15 bg-zinc-950">
+                        <BlogCoverImage
+                          src={post.cover_image}
+                          category={post.category}
+                          alt={post.title}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
 
-                          {/* Category Badge */}
-                          <div className="absolute top-3 left-3 z-10">
-                            <span className="rounded border border-[#FF5500]/50 bg-black/80 px-2 py-0.5 font-mono text-[9px] font-bold text-[#FF5500] backdrop-blur-md">
-                              [ {post.category.toUpperCase()} ]
-                            </span>
-                          </div>
+                        {/* Category Badge */}
+                        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                          <span className="rounded border border-[#FF5500]/50 bg-black/80 px-2 py-0.5 font-mono text-[9px] font-bold text-[#FF5500] backdrop-blur-md">
+                            [ {post.category.toUpperCase()} ]
+                          </span>
                         </div>
-                      )}
+                      </div>
 
                       {/* Content Info */}
                       <div className="p-4 sm:p-5">

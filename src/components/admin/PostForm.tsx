@@ -10,6 +10,7 @@ import {
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import type { BlogPost, PostFormData, PostStatus } from "@/types/blog";
 import WysiwygEditor from "./WysiwygEditor";
+import { getDefaultCover } from "@/components/blog/BlogCoverImage";
 
 interface PostFormProps {
   initialData?: BlogPost;
@@ -315,16 +316,19 @@ export default function PostForm({ initialData, isEdit = false }: PostFormProps)
                 </label>
               </div>
 
-              {coverImage && (
-                <div className="mt-2 rounded border border-dashed border-white/15 overflow-hidden aspect-[16/9] relative bg-zinc-900">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={coverImage}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              <div className="mt-2 rounded border border-dashed border-white/15 overflow-hidden aspect-[16/9] relative bg-zinc-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={coverImage || getDefaultCover(category)}
+                  alt="Cover Preview"
+                  className="w-full h-full object-cover"
+                />
+                {!coverImage && (
+                  <div className="absolute bottom-2 left-2 right-2 rounded bg-black/85 px-2 py-1 font-mono text-[9px] text-[#A3E635] border border-[#A3E635]/30 backdrop-blur-md text-center">
+                    DEFAULT COVER // {category.toUpperCase()}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

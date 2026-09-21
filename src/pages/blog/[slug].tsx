@@ -19,6 +19,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdSlot from "@/components/ads/AdSlot";
+import BlogCoverImage, { getDefaultCover } from "@/components/blog/BlogCoverImage";
 import {
   getPublishedPosts,
   getPostBySlug,
@@ -131,9 +132,14 @@ export default function BlogPostDetail({
         <meta property="og:url" content={pageUrl} />
         <meta property="og:title" content={`${post.title} · Faris Rizqilail`} />
         <meta property="og:description" content={post.excerpt} />
-        {post.cover_image && (
-          <meta property="og:image" content={`${SITE_URL}${post.cover_image}`} />
-        )}
+        <meta
+          property="og:image"
+          content={
+            post.cover_image?.startsWith("http")
+              ? post.cover_image
+              : `${SITE_URL}${post.cover_image || getDefaultCover(post.category)}`
+          }
+        />
         <meta property="article:published_time" content={post.published_at || post.created_at} />
         <meta property="article:author" content="Faris Rizqilail" />
       </Head>
@@ -237,19 +243,17 @@ export default function BlogPostDetail({
             {/* Top Ad Slot (Header AdSense) */}
             <AdSlot slotId="article-top" format="horizontal" />
 
-            {/* Featured Image */}
-            {post.cover_image && (
-              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-dashed border-white/20 bg-zinc-900 shadow-2xl">
-                <Image
-                  src={post.cover_image}
-                  alt={post.title}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 80vw"
-                  className="object-cover object-top"
-                />
-              </div>
-            )}
+            {/* Featured Image with Guaranteed Default Fallback */}
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-dashed border-white/20 bg-zinc-900 shadow-2xl">
+              <BlogCoverImage
+                src={post.cover_image}
+                category={post.category}
+                alt={post.title}
+                priority
+                sizes="(max-width: 1024px) 100vw, 80vw"
+                className="object-cover object-top"
+              />
+            </div>
 
             {/* Article Content / Markdown Render */}
             <div
