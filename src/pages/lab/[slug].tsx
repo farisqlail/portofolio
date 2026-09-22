@@ -79,19 +79,125 @@ export default function ExperimentDetail({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const experiment = getExperimentBySlug(slug);
   const Icon = experiment?.icon;
-  const pageUrl = `${SITE_URL}lab/${slug}`;
+  const baseUrl = SITE_URL.replace(/\/$/, "");
+  const pageUrl = `${baseUrl}/lab/${slug}`;
+  const imageUrl = image.startsWith("http")
+    ? image
+    : `${baseUrl}/${image.replace(/^\//, "")}`;
 
   return (
     <>
       <Head>
-        <title>{title} · Lab · Faris Rizqilail</title>
-        <meta name="description" content={summary} />
+        <title>{title} · Lab & Systems · Faris Rizqilail</title>
+        <meta name="description" content={summary || description} />
+        <meta
+          name="keywords"
+          content={[
+            category,
+            ...techStack,
+            "Software Application",
+            "Interactive Prototype",
+            "Faris Rizqilail",
+            "LailDev",
+          ].join(", ")}
+        />
+        <meta name="author" content="Faris Rizqilail" />
+        <meta
+          name="robots"
+          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        />
         <link rel="canonical" href={pageUrl} />
+
+        {/* Open Graph */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={pageUrl} />
-        <meta property="og:title" content={`${title} · Faris Rizqilail`} />
-        <meta property="og:description" content={summary} />
-        <meta property="og:image" content={`${SITE_URL}${image}`} />
+        <meta property="og:site_name" content="Faris Rizqilail | LailDev" />
+        <meta property="og:title" content={`${title} · Lab · Faris Rizqilail`} />
+        <meta property="og:description" content={summary || description} />
+        <meta property="og:image" content={imageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="675" />
+        <meta property="og:image:alt" content={title} />
+        <meta property="og:locale" content="en_US" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@LailDev" />
+        <meta name="twitter:creator" content="@LailDev" />
+        <meta name="twitter:title" content={`${title} · Lab · Faris Rizqilail`} />
+        <meta name="twitter:description" content={summary || description} />
+        <meta name="twitter:image" content={imageUrl} />
+
+        {/* JSON-LD Structured Data: SoftwareApplication + BreadcrumbList */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "SoftwareApplication",
+                  "@id": `${pageUrl}#app`,
+                  "isPartOf": {
+                    "@type": "WebPage",
+                    "@id": pageUrl,
+                  },
+                  "name": title,
+                  "headline": title,
+                  "description": summary || description,
+                  "applicationCategory": category,
+                  "operatingSystem": "Web Browser, Cross-platform",
+                  "url": pageUrl,
+                  "image": imageUrl,
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD",
+                  },
+                  "author": {
+                    "@type": "Person",
+                    "name": "Faris Rizqilail",
+                    "url": baseUrl,
+                    "jobTitle": "Software Engineer & Founder @LailDev",
+                  },
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "LailDev",
+                    "url": baseUrl,
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": `${baseUrl}/assets/icons/logo.png`,
+                    },
+                  },
+                },
+                {
+                  "@type": "BreadcrumbList",
+                  "@id": `${pageUrl}#breadcrumb`,
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": baseUrl,
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Lab Experiments",
+                      "item": `${baseUrl}/#experiments`,
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 3,
+                      "name": title,
+                      "item": pageUrl,
+                    },
+                  ],
+                },
+              ],
+            }),
+          }}
+        />
       </Head>
 
       <div

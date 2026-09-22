@@ -79,18 +79,102 @@ export default function BlogIndex({
   return (
     <>
       <Head>
-        <title>Engineering Blog &amp; Notes · Faris Rizqilail</title>
+        <title>Engineering Blog &amp; Architecture Notes · Faris Rizqilail</title>
         <meta
           name="description"
-          content="Technical writing on system architecture, Next.js, Laravel microservices, multi-agent AI systems, and software leadership by Faris Rizqilail."
+          content="Technical writing on system architecture, Next.js 16, Laravel microservices, multi-agent AI systems, and software engineering leadership by Faris Rizqilail."
         />
+        <meta
+          name="keywords"
+          content="Engineering Blog, Software Architecture, Next.js 16, React 19, Microservices, Laravel, Multi-Agent AI, LailDev, Faris Rizqilail, Web3"
+        />
+        <meta name="author" content="Faris Rizqilail" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <link rel="canonical" href={`${SITE_URL}blog`} />
+
+        {/* OpenGraph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${SITE_URL}blog`} />
-        <meta property="og:title" content="Engineering Blog &amp; Notes · Faris Rizqilail" />
+        <meta property="og:site_name" content="Faris Rizqilail | LailDev" />
+        <meta property="og:title" content="Engineering Blog &amp; Architecture Notes · Faris Rizqilail" />
         <meta
           property="og:description"
-          content="Technical architecture, modern full-stack workflows, and developer tools."
+          content="Technical writing on system architecture, Next.js 16, Laravel microservices, multi-agent AI systems, and software engineering leadership."
+        />
+        <meta
+          property="og:image"
+          content={`${SITE_URL}assets/images/categories/engineering.jpg`}
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="675" />
+        <meta property="og:image:alt" content="Engineering Blog &amp; Architecture Notes" />
+        <meta property="og:locale" content="en_US" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@LailDev" />
+        <meta name="twitter:creator" content="@LailDev" />
+        <meta name="twitter:title" content="Engineering Blog &amp; Architecture Notes · Faris Rizqilail" />
+        <meta
+          name="twitter:description"
+          content="Technical writing on system architecture, Next.js 16, Laravel microservices, multi-agent AI systems, and software engineering leadership."
+        />
+        <meta
+          name="twitter:image"
+          content={`${SITE_URL}assets/images/categories/engineering.jpg`}
+        />
+
+        {/* JSON-LD Structured Data: Blog + Breadcrumbs */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Blog",
+                  "@id": `${SITE_URL}blog#blog`,
+                  "name": "Engineering Blog & Architecture Notes",
+                  "description":
+                    "Technical writing on system architecture, Next.js 16, Laravel microservices, multi-agent AI systems, and software engineering leadership by Faris Rizqilail.",
+                  "url": `${SITE_URL}blog`,
+                  "inLanguage": "en-US",
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "LailDev",
+                    "url": SITE_URL,
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": `${SITE_URL}assets/icons/logo.png`,
+                    },
+                  },
+                  "author": {
+                    "@type": "Person",
+                    "name": "Faris Rizqilail",
+                    "url": SITE_URL,
+                    "jobTitle": "Software Engineer & Founder @LailDev",
+                  },
+                },
+                {
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": SITE_URL,
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Blog",
+                      "item": `${SITE_URL}blog`,
+                    },
+                  ],
+                },
+              ],
+            }),
+          }}
         />
       </Head>
 

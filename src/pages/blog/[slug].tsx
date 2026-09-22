@@ -122,27 +122,121 @@ export default function BlogPostDetail({
       })
     : "Recently Published";
 
+  const coverUrl = post.cover_image?.startsWith("http")
+    ? post.cover_image
+    : `${SITE_URL.replace(/\/$/, "")}/${(post.cover_image || getDefaultCover(post.category)).replace(/^\//, "")}`;
+
+  const publishedDate = post.published_at || post.created_at || new Date().toISOString();
+  const modifiedDate = post.updated_at || publishedDate;
+
   return (
     <>
       <Head>
-        <title>{post.title} · Faris Rizqilail Blog</title>
+        <title>{post.title} · Faris Rizqilail</title>
         <meta name="description" content={post.excerpt} />
+        <meta
+          name="keywords"
+          content={[post.category, ...post.tags, "Software Engineering", "Faris Rizqilail", "LailDev"].join(", ")}
+        />
+        <meta name="author" content="Faris Rizqilail" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <link rel="canonical" href={pageUrl} />
+
+        {/* Open Graph */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="Faris Rizqilail | LailDev" />
         <meta property="og:title" content={`${post.title} · Faris Rizqilail`} />
         <meta property="og:description" content={post.excerpt} />
-        <meta
-          property="og:image"
-          content={
-            post.cover_image?.startsWith("http")
-              ? post.cover_image
-              : `${SITE_URL}${post.cover_image || getDefaultCover(post.category)}`
-          }
-        />
-        <meta property="article:published_time" content={post.published_at || post.created_at} />
+        <meta property="og:image" content={coverUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="675" />
+        <meta property="og:image:alt" content={post.title} />
+        <meta property="og:locale" content="en_US" />
+        <meta property="article:published_time" content={publishedDate} />
+        <meta property="article:modified_time" content={modifiedDate} />
         <meta property="article:author" content="Faris Rizqilail" />
+        <meta property="article:section" content={post.category} />
+        {post.tags.map((tag) => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@LailDev" />
+        <meta name="twitter:creator" content="@LailDev" />
+        <meta name="twitter:title" content={`${post.title} · Faris Rizqilail`} />
+        <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:image" content={coverUrl} />
+
+        {/* JSON-LD Structured Data: TechArticle + BreadcrumbList */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "TechArticle",
+                  "@id": `${pageUrl}#article`,
+                  "isPartOf": {
+                    "@type": "WebPage",
+                    "@id": pageUrl,
+                  },
+                  "headline": post.title,
+                  "description": post.excerpt,
+                  "image": coverUrl,
+                  "datePublished": publishedDate,
+                  "dateModified": modifiedDate,
+                  "mainEntityOfPage": pageUrl,
+                  "inLanguage": "en-US",
+                  "articleSection": post.category,
+                  "keywords": post.tags.join(", "),
+                  "author": {
+                    "@type": "Person",
+                    "name": "Faris Rizqilail",
+                    "url": SITE_URL,
+                    "jobTitle": "Software Engineer & Founder @LailDev",
+                  },
+                  "publisher": {
+                    "@type": "Organization",
+                    "name": "LailDev",
+                    "url": SITE_URL,
+                    "logo": {
+                      "@type": "ImageObject",
+                      "url": `${SITE_URL.replace(/\/$/, "")}/assets/icons/logo.png`,
+                    },
+                  },
+                },
+                {
+                  "@type": "BreadcrumbList",
+                  "itemListElement": [
+                    {
+                      "@type": "ListItem",
+                      "position": 1,
+                      "name": "Home",
+                      "item": SITE_URL,
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 2,
+                      "name": "Blog",
+                      "item": `${SITE_URL.replace(/\/$/, "")}/blog`,
+                    },
+                    {
+                      "@type": "ListItem",
+                      "position": 3,
+                      "name": post.title,
+                      "item": pageUrl,
+                    },
+                  ],
+                },
+              ],
+            }),
+          }}
+        />
       </Head>
+
 
       <div
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#07070a] text-foreground font-sans relative overflow-hidden flex flex-col justify-between`}
