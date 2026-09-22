@@ -14,12 +14,14 @@ export default function AnalyticsTracker() {
         return;
       }
 
-      // Avoid double counting same page visit within the same browser tab session
-      const sessionKey = `visited_page_${url}`;
-      if (sessionStorage.getItem(sessionKey)) {
+      // Debounce rapid reloads or double-clicks within 2 seconds
+      const now = Date.now();
+      const lastVisitKey = `last_visit_${url}`;
+      const lastVisit = sessionStorage.getItem(lastVisitKey);
+      if (lastVisit && now - Number(lastVisit) < 2000) {
         return;
       }
-      sessionStorage.setItem(sessionKey, "1");
+      sessionStorage.setItem(lastVisitKey, String(now));
 
       // Device detection
       const width = window.innerWidth;

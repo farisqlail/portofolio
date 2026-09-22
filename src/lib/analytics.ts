@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
-import { SAMPLE_POSTS } from "@/lib/blogData";
 
 export interface TimeSeriesDataPoint {
   date: string; // ISO date YYYY-MM-DD
@@ -40,7 +39,7 @@ export interface AnalyticsSummary {
   uniqueVisitors: number;
   todayViews: number;
   topCategory: string;
-  growthRate: number; // e.g. +14.5%
+  growthRate: number | null; // null if no previous period data
   timeSeries: TimeSeriesDataPoint[];
   categoryDistribution: CategoryTraffic[];
   deviceDistribution: DeviceTraffic[];
@@ -55,10 +54,28 @@ const CATEGORY_COLORS: Record<string, string> = {
   Web3: "#C084FC", // Soft Purple
   Leadership: "#FCD34D", // Amber
   Portfolio: "#94A3B8", // Slate
+  Lab: "#F43F5E", // Rose
 };
 
 /**
- * Log a website page visit to Supabase
+ * Get or create an anonymous visitor ID persisted in localStorage
+ */
+export function getVisitorId(): string {
+  if (typeof window === "undefined") return "server";
+  try {
+    let vid = localStorage.getItem("pa_vid");
+    if (!vid) {
+      vid = "v_" + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+      localStorage.setItem("pa_vid", vid);
+    }
+    return vid;
+  } catch {
+    return "anon";
+  }
+}
+
+/**
+ * Log a real page visit directly to Supabase site_visits table
  */
 export async function logSiteVisit(params: {
   path: string;
@@ -67,6 +84,7 @@ export async function logSiteVisit(params: {
   category?: string;
   device?: string;
   referrer?: string;
+  visitor_id?: string;
 }): Promise<void> {
   if (!isSupabaseConfigured) return;
 
@@ -78,113 +96,243 @@ export async function logSiteVisit(params: {
       category = "Engineering",
       device = "desktop",
       referrer = "direct",
+      visitor_id = getVisitorId(),
     } = params;
 
-    // Use RPC if available, fallback to direct insert
-    const { error } = await supabase.rpc("log_site_visit", {
-      p_path: path,
-      p_page_type: page_type,
-      p_title: title,
-      p_category: category,
-      p_device: device,
-      p_referrer: referrer,
-    });
+    // Try direct insert first
+    const insertPayload: Record<string, unknown> = {
+      path,
+      page_type,
+      title,
+      category,
+      device,
+      referrer,
+    };
 
-    if (error) {
-      // Fallback direct insert if RPC not yet created
-      await supabase.from("site_visits").insert({
-        path,
-        page_type,
-        title,
-        category,
-        device,
-        referrer,
-      });
+    if (visitor_id) {
+      insertPayload.visitor_id = visitor_id;
+    }
+
+    const { error } = await supabase.from("site_visits").insert(insertPayload);
+
+    // If visitor_id column doesn't exist in Supabase yet, retry without it
+    if (error && error.message?.includes("visitor_id")) {
+      delete insertPayload.visitor_id;
+      await supabase.from("site_visits").insert(insertPayload);
     }
   } catch {
-    // Fail silently in telemetry
+    // Fail silently in client telemetry
   }
 }
 
 /**
- * Generates synthetic baseline data matching real Supabase posts total views
- * to ensure charts are always populated and readable from day one.
+ * Fetch 100% REAL analytics aggregated directly from Supabase posts and site_visits tables.
+ * NO synthetic, random, or baseline simulation data.
  */
-function generateBaselineAnalytics(
-  days: number,
-  postsData: Array<{ title: string; slug: string; category: string; view_count: number }>
-): AnalyticsSummary {
-  const totalPostViews = postsData.reduce((acc, p) => acc + (p.view_count || 0), 0);
-  const baselineTotal = Math.max(totalPostViews, 128);
+export async function getAnalyticsSummary(days: number = 7): Promise<AnalyticsSummary> {
+  // 1. Fetch real posts from Supabase
+  let posts: Array<{ title: string; slug: string; category: string; view_count: number }> = [];
 
-  // Time series generation for the past N days
+  if (isSupabaseConfigured) {
+    try {
+      const { data: postsData } = await supabase
+        .from("posts")
+        .select("title, slug, category, view_count")
+        .order("view_count", { ascending: false });
+
+      if (postsData) {
+        posts = postsData;
+      }
+    } catch (err) {
+      console.warn("Failed to fetch posts from Supabase:", err);
+    }
+  }
+
+  // Sum of real post views recorded in the posts table
+  const totalPostViews = posts.reduce((sum, p) => sum + (p.view_count || 0), 0);
+
+  // 2. Query real site_visits for the requested date window
   const now = new Date();
-  const timeSeries: TimeSeriesDataPoint[] = [];
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - days);
+  cutoff.setHours(0, 0, 0, 0);
 
-  // Distribution weights over days (slight weekend dips, weekday peaks)
-  const dayWeights = [0.12, 0.16, 0.18, 0.15, 0.17, 0.11, 0.11];
-  let accumulatedViews = 0;
+  let visits: Array<{
+    id: string;
+    path: string;
+    page_type: string;
+    title: string | null;
+    category: string | null;
+    device: string | null;
+    referrer: string | null;
+    visitor_id?: string | null;
+    created_at: string;
+  }> = [];
+
+  if (isSupabaseConfigured) {
+    try {
+      const { data: visitsData, error: visitsError } = await supabase
+        .from("site_visits")
+        .select("*")
+        .gte("created_at", cutoff.toISOString())
+        .order("created_at", { ascending: true });
+
+      if (!visitsError && visitsData) {
+        visits = visitsData;
+      }
+    } catch (err) {
+      console.warn("Failed to query site_visits from Supabase:", err);
+    }
+  }
+
+  // 3. Query previous period visits to calculate genuine growth rate (if available)
+  let growthRate: number | null = null;
+  if (isSupabaseConfigured && visits.length > 0) {
+    try {
+      const prevCutoff = new Date(cutoff);
+      prevCutoff.setDate(prevCutoff.getDate() - days);
+
+      const { data: prevVisits } = await supabase
+        .from("site_visits")
+        .select("id")
+        .gte("created_at", prevCutoff.toISOString())
+        .lt("created_at", cutoff.toISOString());
+
+      if (prevVisits && prevVisits.length > 0) {
+        growthRate = Math.round(((visits.length - prevVisits.length) / prevVisits.length) * 1000) / 10;
+      }
+    } catch {
+      growthRate = null;
+    }
+  }
+
+  // 4. Build exact daily time series for the past N days (100% REAL)
+  const timeSeries: TimeSeriesDataPoint[] = [];
+  const dateMap: Record<string, { views: number; visitors: Set<string> }> = {};
 
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
-    const displayDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const dateKey = d.toISOString().split("T")[0];
+    dateMap[dateKey] = { views: 0, visitors: new Set() };
+  }
 
-    const dayOfWeek = d.getDay();
-    const weight = dayWeights[dayOfWeek % dayWeights.length];
-    const randomVariation = 0.85 + ((i * 17 + dayOfWeek * 13) % 30) / 100;
-    
-    // Distribute total across days
-    const dailyTarget = (baselineTotal / Math.max(days, 7)) * weight * randomVariation * 1.5;
-    const views = Math.max(1, Math.round(dailyTarget));
-    const visitors = Math.max(1, Math.round(views * 0.72));
+  // Populate from real site_visits
+  visits.forEach((v) => {
+    const dayKey = v.created_at ? v.created_at.split("T")[0] : "";
+    if (dateMap[dayKey]) {
+      dateMap[dayKey].views += 1;
+      const visitorKey = v.visitor_id || `${v.device || "d"}_${v.referrer || "r"}`;
+      dateMap[dayKey].visitors.add(visitorKey);
+    }
+  });
 
-    accumulatedViews += views;
+  Object.entries(dateMap).forEach(([dateStr, stats]) => {
+    const d = new Date(dateStr);
     timeSeries.push({
       date: dateStr,
-      displayDate,
-      views,
-      visitors,
+      displayDate: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      views: stats.views,
+      visitors: stats.visitors.size,
+    });
+  });
+
+  // 5. Compute real KPI metrics
+  const todayKey = now.toISOString().split("T")[0];
+  const todayViews = dateMap[todayKey]?.views || 0;
+
+  // Real unique visitors in this period
+  const allUniqueVisitors = new Set<string>();
+  visits.forEach((v) => {
+    allUniqueVisitors.add(v.visitor_id || `${v.device || "d"}_${v.referrer || "r"}`);
+  });
+  const uniqueVisitors = allUniqueVisitors.size;
+
+  // Real total views:
+  // If site_visits has logged rows, total views in the period is visits.length.
+  // Otherwise, fallback to the real posts view_count from Supabase.
+  const totalViews = visits.length > 0 ? visits.length : totalPostViews;
+
+  // 6. Real Category Distribution
+  const catMap: Record<string, number> = {};
+
+  if (visits.length > 0) {
+    visits.forEach((v) => {
+      const cat = v.category || "Engineering";
+      catMap[cat] = (catMap[cat] || 0) + 1;
+    });
+  } else {
+    // When site_visits is fresh, aggregate directly from real posts view_count
+    posts.forEach((p) => {
+      const cat = p.category || "Engineering";
+      catMap[cat] = (catMap[cat] || 0) + (p.view_count || 0);
     });
   }
 
-  // Categories aggregation
-  const catMap: Record<string, number> = {};
-  postsData.forEach((p) => {
-    const cat = p.category || "Engineering";
-    catMap[cat] = (catMap[cat] || 0) + (p.view_count || 1);
-  });
-
-  const totalCatViews = Object.values(catMap).reduce((a, b) => a + b, 0) || 1;
+  const totalCatViews = Object.values(catMap).reduce((a, b) => a + b, 0);
   const categoryDistribution: CategoryTraffic[] = Object.entries(catMap)
+    .filter(([_, count]) => count > 0)
     .map(([cat, count]) => ({
       category: cat,
       views: count,
-      percentage: Math.round((count / totalCatViews) * 100),
+      percentage: totalCatViews > 0 ? Math.round((count / totalCatViews) * 100) : 0,
       color: CATEGORY_COLORS[cat] || "#FF5500",
     }))
     .sort((a, b) => b.views - a.views);
 
-  const topCategory = categoryDistribution[0]?.category || "Engineering";
+  const topCategory = categoryDistribution[0]?.category || (posts[0]?.category ?? "None");
 
-  // Device distribution
-  const deviceDistribution: DeviceTraffic[] = [
-    { device: "desktop", views: Math.round(accumulatedViews * 0.68), percentage: 68 },
-    { device: "mobile", views: Math.round(accumulatedViews * 0.28), percentage: 28 },
-    { device: "tablet", views: Math.round(accumulatedViews * 0.04), percentage: 4 },
-  ];
+  // 7. Real Device Distribution
+  const devMap: Record<string, number> = { desktop: 0, mobile: 0, tablet: 0 };
+  visits.forEach((v) => {
+    const dev = (v.device || "desktop").toLowerCase();
+    if (dev in devMap) {
+      devMap[dev] += 1;
+    } else {
+      devMap.desktop += 1;
+    }
+  });
 
-  // Sources
-  const sourceDistribution: SourceTraffic[] = [
-    { source: "Direct / Organic", views: Math.round(accumulatedViews * 0.46), percentage: 46 },
-    { source: "Google Search", views: Math.round(accumulatedViews * 0.31), percentage: 31 },
-    { source: "GitHub / Lab", views: Math.round(accumulatedViews * 0.15), percentage: 15 },
-    { source: "Twitter / X", views: Math.round(accumulatedViews * 0.08), percentage: 8 },
-  ];
+  const totalDevices = Object.values(devMap).reduce((a, b) => a + b, 0);
+  const deviceDistribution: DeviceTraffic[] = (
+    ["desktop", "mobile", "tablet"] as const
+  ).map((device) => ({
+    device,
+    views: devMap[device],
+    percentage: totalDevices > 0 ? Math.round((devMap[device] / totalDevices) * 100) : 0,
+  }));
 
-  // Top Pages
-  const topPages: TopPage[] = postsData
+  // 8. Real Source Distribution
+  const srcMap: Record<string, number> = {};
+  visits.forEach((v) => {
+    const ref = v.referrer || "direct";
+    const sourceName =
+      ref.includes("google")
+        ? "Google Search"
+        : ref.includes("github")
+        ? "GitHub"
+        : ref.includes("twitter") || ref.includes("t.co") || ref.includes("x.com")
+        ? "Twitter / X"
+        : ref.includes("linkedin")
+        ? "LinkedIn"
+        : ref === "direct" || !ref
+        ? "Direct / Organic"
+        : ref;
+
+    srcMap[sourceName] = (srcMap[sourceName] || 0) + 1;
+  });
+
+  const totalSources = Object.values(srcMap).reduce((a, b) => a + b, 0);
+  const sourceDistribution: SourceTraffic[] = Object.entries(srcMap)
+    .map(([source, count]) => ({
+      source,
+      views: count,
+      percentage: totalSources > 0 ? Math.round((count / totalSources) * 100) : 0,
+    }))
+    .sort((a, b) => b.views - a.views);
+
+  // 9. Real Top Pages (100% from Supabase posts table)
+  const topPages: TopPage[] = posts
     .slice()
     .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
     .slice(0, 10)
@@ -193,177 +341,19 @@ function generateBaselineAnalytics(
       title: p.title,
       category: p.category,
       views: p.view_count || 0,
-      percentage: Math.round(((p.view_count || 0) / Math.max(totalPostViews, 1)) * 100),
+      percentage: totalPostViews > 0 ? Math.round(((p.view_count || 0) / totalPostViews) * 100) : 0,
     }));
 
-  const todayViews = timeSeries[timeSeries.length - 1]?.views || 0;
-  const uniqueVisitors = Math.round(accumulatedViews * 0.74);
-
   return {
-    totalViews: Math.max(accumulatedViews, totalPostViews),
+    totalViews,
     uniqueVisitors,
     todayViews,
     topCategory,
-    growthRate: 14.8,
+    growthRate,
     timeSeries,
     categoryDistribution,
     deviceDistribution,
     sourceDistribution,
     topPages,
   };
-}
-
-/**
- * Fetch analytics data aggregated over the requested time horizon (7, 14, 30, or 90 days)
- */
-export async function getAnalyticsSummary(days: number = 7): Promise<AnalyticsSummary> {
-  let posts: Array<{ title: string; slug: string; category: string; view_count: number }> = SAMPLE_POSTS;
-
-  if (isSupabaseConfigured) {
-    try {
-      // 1. Fetch real posts view counts
-      const { data: postsData } = await supabase
-        .from("posts")
-        .select("title, slug, category, view_count")
-        .order("view_count", { ascending: false });
-
-      if (postsData && postsData.length > 0) {
-        posts = postsData;
-      }
-
-      // 2. Check if we have logs in site_visits
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - days);
-
-      const { data: visits, error } = await supabase
-        .from("site_visits")
-        .select("*")
-        .gte("created_at", cutoff.toISOString())
-        .order("created_at", { ascending: true });
-
-      if (!error && visits && visits.length > 5) {
-        // Aggregate real site_visits logs
-        const dateMap: Record<string, { views: number; visitors: Set<string> }> = {};
-        const catMap: Record<string, number> = {};
-        const devMap: Record<string, number> = { desktop: 0, mobile: 0, tablet: 0 };
-        const srcMap: Record<string, number> = {};
-        const pageMap: Record<string, { title: string; category: string; count: number }> = {};
-
-        // Prepopulate dates
-        const now = new Date();
-        for (let i = days - 1; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - i);
-          const key = d.toISOString().split("T")[0];
-          dateMap[key] = { views: 0, visitors: new Set() };
-        }
-
-        visits.forEach((v) => {
-          const dayKey = v.created_at.split("T")[0];
-          if (dateMap[dayKey]) {
-            dateMap[dayKey].views += 1;
-            dateMap[dayKey].visitors.add(v.referrer || "anon");
-          }
-
-          const cat = v.category || "Engineering";
-          catMap[cat] = (catMap[cat] || 0) + 1;
-
-          const dev = (v.device || "desktop") as "desktop" | "mobile" | "tablet";
-          if (devMap[dev] !== undefined) {
-            devMap[dev] += 1;
-          }
-
-          const src = v.referrer?.includes("google")
-            ? "Google Search"
-            : v.referrer?.includes("github")
-            ? "GitHub"
-            : v.referrer?.includes("t.co") || v.referrer?.includes("twitter")
-            ? "Twitter / X"
-            : "Direct / Organic";
-          srcMap[src] = (srcMap[src] || 0) + 1;
-
-          const path = v.path || "/";
-          if (!pageMap[path]) {
-            pageMap[path] = {
-              title: v.title || path,
-              category: v.category || "Engineering",
-              count: 0,
-            };
-          }
-          pageMap[path].count += 1;
-        });
-
-        const timeSeries: TimeSeriesDataPoint[] = Object.entries(dateMap).map(([dateStr, val]) => {
-          const d = new Date(dateStr);
-          return {
-            date: dateStr,
-            displayDate: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-            views: val.views,
-            visitors: Math.max(1, Math.round(val.views * 0.7)),
-          };
-        });
-
-        const totalViews = visits.length;
-        const totalCat = Object.values(catMap).reduce((a, b) => a + b, 0) || 1;
-        const categoryDistribution: CategoryTraffic[] = Object.entries(catMap)
-          .map(([cat, count]) => ({
-            category: cat,
-            views: count,
-            percentage: Math.round((count / totalCat) * 100),
-            color: CATEGORY_COLORS[cat] || "#FF5500",
-          }))
-          .sort((a, b) => b.views - a.views);
-
-        const totalDev = Object.values(devMap).reduce((a, b) => a + b, 0) || 1;
-        const deviceDistribution: DeviceTraffic[] = (
-          ["desktop", "mobile", "tablet"] as const
-        ).map((dev) => ({
-          device: dev,
-          views: devMap[dev],
-          percentage: Math.round((devMap[dev] / totalDev) * 100),
-        }));
-
-        const totalSrc = Object.values(srcMap).reduce((a, b) => a + b, 0) || 1;
-        const sourceDistribution: SourceTraffic[] = Object.entries(srcMap)
-          .map(([source, count]) => ({
-            source,
-            views: count,
-            percentage: Math.round((count / totalSrc) * 100),
-          }))
-          .sort((a, b) => b.views - a.views);
-
-        const topPages: TopPage[] = Object.entries(pageMap)
-          .map(([path, data]) => ({
-            path,
-            title: data.title,
-            category: data.category,
-            views: data.count,
-            percentage: Math.round((data.count / totalViews) * 100),
-          }))
-          .sort((a, b) => b.views - a.views)
-          .slice(0, 10);
-
-        const todayKey = now.toISOString().split("T")[0];
-        const todayViews = dateMap[todayKey]?.views || 0;
-
-        return {
-          totalViews,
-          uniqueVisitors: Math.round(totalViews * 0.72),
-          todayViews,
-          topCategory: categoryDistribution[0]?.category || "Engineering",
-          growthRate: 18.2,
-          timeSeries,
-          categoryDistribution,
-          deviceDistribution,
-          sourceDistribution,
-          topPages,
-        };
-      }
-    } catch (e) {
-      console.warn("Analytics fetch error, using baseline:", e);
-    }
-  }
-
-  // If visits table is empty or dev mode, return baseline generated from actual posts
-  return generateBaselineAnalytics(days, posts);
 }

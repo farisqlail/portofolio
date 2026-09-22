@@ -133,8 +133,12 @@ CREATE TABLE IF NOT EXISTS public.site_visits (
     category TEXT DEFAULT 'Engineering',
     device TEXT DEFAULT 'desktop', -- 'desktop', 'mobile', 'tablet'
     referrer TEXT DEFAULT 'direct',
+    visitor_id TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
+
+-- Ensure visitor_id column exists if table already existed
+ALTER TABLE public.site_visits ADD COLUMN IF NOT EXISTS visitor_id TEXT;
 
 -- Performance indexes for analytics aggregation
 CREATE INDEX IF NOT EXISTS idx_site_visits_created_at ON public.site_visits(created_at DESC);
@@ -153,12 +157,13 @@ FOR INSERT
 TO anon, authenticated
 WITH CHECK (true);
 
--- Policy: Only authenticated admin can query analytics data
+-- Policy: Allow reading analytics data for telemetry dashboard
 DROP POLICY IF EXISTS "Admin can view all visits" ON public.site_visits;
-CREATE POLICY "Admin can view all visits"
+DROP POLICY IF EXISTS "Allow read site_visits" ON public.site_visits;
+CREATE POLICY "Allow read site_visits"
 ON public.site_visits
 FOR SELECT
-TO authenticated
+TO anon, authenticated
 USING (true);
 
 -- Stored procedure (RPC) for optimized visit logging
@@ -168,14 +173,16 @@ CREATE OR REPLACE FUNCTION public.log_site_visit(
     p_title TEXT DEFAULT NULL,
     p_category TEXT DEFAULT 'Engineering',
     p_device TEXT DEFAULT 'desktop',
-    p_referrer TEXT DEFAULT 'direct'
+    p_referrer TEXT DEFAULT 'direct',
+    p_visitor_id TEXT DEFAULT NULL
 )
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
-    INSERT INTO public.site_visits (path, page_type, title, category, device, referrer)
-    VALUES (p_path, p_page_type, p_title, p_category, p_device, p_referrer);
+    INSERT INTO public.site_visits (path, page_type, title, category, device, referrer, visitor_id)
+    VALUES (p_path, p_page_type, p_title, p_category, p_device, p_referrer, p_visitor_id);
 END;
 $$;
+

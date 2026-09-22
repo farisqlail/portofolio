@@ -125,9 +125,15 @@ export default function AnalyticsDashboard() {
               <div className="text-2xl sm:text-3xl font-bold font-mono text-white">
                 {loading || !summary ? "..." : summary.totalViews.toLocaleString()}
               </div>
-              <div className="flex items-center gap-1.5 mt-1 font-mono text-[10px] text-[#A3E635]">
-                <ArrowUpRight size={12} />
-                <span>+{summary?.growthRate ?? 14.8}% vs previous cycle</span>
+              <div className="flex items-center gap-1.5 mt-1 font-mono text-[10px]">
+                {summary?.growthRate !== null && summary?.growthRate !== undefined ? (
+                  <span className={`flex items-center gap-1 ${summary.growthRate >= 0 ? "text-[#A3E635]" : "text-rose-400"}`}>
+                    <ArrowUpRight size={12} className={summary.growthRate < 0 ? "rotate-90" : ""} />
+                    <span>{summary.growthRate > 0 ? `+${summary.growthRate}%` : `${summary.growthRate}%`} vs prev</span>
+                  </span>
+                ) : (
+                  <span className="text-zinc-500">Live Supabase telemetry</span>
+                )}
               </div>
             </div>
           </div>
