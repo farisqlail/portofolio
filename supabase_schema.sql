@@ -30,12 +30,14 @@ CREATE INDEX IF NOT EXISTS idx_posts_published_at ON public.posts(published_at D
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 
 -- Policy A: Public can read published posts
+DROP POLICY IF EXISTS "Public can view published posts" ON public.posts;
 CREATE POLICY "Public can view published posts" 
 ON public.posts 
 FOR SELECT 
 USING (status = 'published');
 
 -- Policy B: Authenticated admin users have full access (CRUD)
+DROP POLICY IF EXISTS "Admin full access" ON public.posts;
 CREATE POLICY "Admin full access" 
 ON public.posts 
 FOR ALL 
@@ -63,12 +65,14 @@ VALUES ('blog-assets', 'blog-assets', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage Policy: Public Read Access
+DROP POLICY IF EXISTS "Public Read blog-assets" ON storage.objects;
 CREATE POLICY "Public Read blog-assets"
 ON storage.objects
 FOR SELECT
 USING (bucket_id = 'blog-assets');
 
 -- Storage Policy: Authenticated Upload Access
+DROP POLICY IF EXISTS "Admin Upload blog-assets" ON storage.objects;
 CREATE POLICY "Admin Upload blog-assets"
 ON storage.objects
 FOR INSERT
@@ -142,6 +146,7 @@ CREATE INDEX IF NOT EXISTS idx_site_visits_device ON public.site_visits(device);
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Anyone (anon/authenticated) can record a page visit
+DROP POLICY IF EXISTS "Public can log page visits" ON public.site_visits;
 CREATE POLICY "Public can log page visits"
 ON public.site_visits
 FOR INSERT
@@ -149,6 +154,7 @@ TO anon, authenticated
 WITH CHECK (true);
 
 -- Policy: Only authenticated admin can query analytics data
+DROP POLICY IF EXISTS "Admin can view all visits" ON public.site_visits;
 CREATE POLICY "Admin can view all visits"
 ON public.site_visits
 FOR SELECT
