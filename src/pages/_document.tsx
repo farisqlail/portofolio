@@ -7,6 +7,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        <link rel="icon" href="/assets/icons/logo.png" type="image/png" />
         {ADSENSE_CLIENT_ID && (
           <meta name="google-adsense-account" content={ADSENSE_CLIENT_ID} />
         )}

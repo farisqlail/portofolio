@@ -11,6 +11,7 @@ import {
   LogOut,
   ShieldAlert,
   Sparkles,
+  ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/lib/authContext";
 
@@ -36,6 +37,7 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
 
   const navLinks = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { label: "Templates", href: "/admin/templates", icon: ShoppingBag },
     { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { label: "Articles", href: "/admin/posts", icon: FileText },
     { label: "New Article", href: "/admin/posts/new", icon: PlusCircle },

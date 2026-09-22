@@ -186,3 +186,68 @@ BEGIN
 END;
 $$;
 
+-- ==============================================================================
+-- 7. GUMROAD TEMPLATES & ASSETS
+-- ==============================================================================
+
+-- Create templates table
+CREATE TABLE IF NOT EXISTS public.templates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    price TEXT NOT NULL DEFAULT '$29',
+    gumroad_url TEXT NOT NULL,
+    preview_url TEXT DEFAULT '',
+    image_url TEXT NOT NULL,
+    tags TEXT[] DEFAULT '{}',
+    featured BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_templates_created_at ON public.templates(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_templates_featured ON public.templates(featured);
+
+-- Enable RLS
+ALTER TABLE public.templates ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Public can view templates
+DROP POLICY IF EXISTS "Public can view templates" ON public.templates;
+CREATE POLICY "Public can view templates"
+ON public.templates
+FOR SELECT
+USING (true);
+
+-- Policy: Allow manage templates
+DROP POLICY IF EXISTS "Allow manage templates" ON public.templates;
+CREATE POLICY "Allow manage templates"
+ON public.templates
+FOR ALL
+USING (true)
+WITH CHECK (true);
+
+-- Storage Bucket for templates images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('templates', 'templates', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage Policies for templates
+DROP POLICY IF EXISTS "Public Read templates" ON storage.objects;
+CREATE POLICY "Public Read templates"
+ON storage.objects
+FOR SELECT
+USING (bucket_id = 'templates');
+
+DROP POLICY IF EXISTS "Allow upload to templates bucket" ON storage.objects;
+CREATE POLICY "Allow upload to templates bucket"
+ON storage.objects
+FOR INSERT
+WITH CHECK (bucket_id = 'templates');
+
+DROP POLICY IF EXISTS "Allow delete from templates bucket" ON storage.objects;
+CREATE POLICY "Allow delete from templates bucket"
+ON storage.objects
+FOR DELETE
+USING (bucket_id = 'templates');
+
+
