@@ -1,4 +1,4 @@
-﻿-- ==============================================================================
+-- ==============================================================================
 -- SUPABASE SCHEMA & POLICIES FOR FARIS RIZQILAIL PORTFOLIO BLOG & CMS
 -- ==============================================================================
 
@@ -115,3 +115,61 @@ VALUES
   NOW()
 )
 ON CONFLICT (slug) DO NOTHING;
+
+-- ==============================================================================
+-- 6. SITE VISITS & TRAFFIC ANALYTICS
+-- ==============================================================================
+
+-- Create site_visits table for real-time telemetry and page impressions
+CREATE TABLE IF NOT EXISTS public.site_visits (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    path TEXT NOT NULL,
+    page_type TEXT NOT NULL DEFAULT 'blog_post', -- 'blog_post', 'blog_index', 'home', 'lab', 'hermes'
+    title TEXT,
+    category TEXT DEFAULT 'Engineering',
+    device TEXT DEFAULT 'desktop', -- 'desktop', 'mobile', 'tablet'
+    referrer TEXT DEFAULT 'direct',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+-- Performance indexes for analytics aggregation
+CREATE INDEX IF NOT EXISTS idx_site_visits_created_at ON public.site_visits(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_site_visits_path ON public.site_visits(path);
+CREATE INDEX IF NOT EXISTS idx_site_visits_category ON public.site_visits(category);
+CREATE INDEX IF NOT EXISTS idx_site_visits_device ON public.site_visits(device);
+
+-- Enable RLS
+ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Anyone (anon/authenticated) can record a page visit
+CREATE POLICY "Public can log page visits"
+ON public.site_visits
+FOR INSERT
+TO anon, authenticated
+WITH CHECK (true);
+
+-- Policy: Only authenticated admin can query analytics data
+CREATE POLICY "Admin can view all visits"
+ON public.site_visits
+FOR SELECT
+TO authenticated
+USING (true);
+
+-- Stored procedure (RPC) for optimized visit logging
+CREATE OR REPLACE FUNCTION public.log_site_visit(
+    p_path TEXT,
+    p_page_type TEXT DEFAULT 'blog_post',
+    p_title TEXT DEFAULT NULL,
+    p_category TEXT DEFAULT 'Engineering',
+    p_device TEXT DEFAULT 'desktop',
+    p_referrer TEXT DEFAULT 'direct'
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    INSERT INTO public.site_visits (path, page_type, title, category, device, referrer)
+    VALUES (p_path, p_page_type, p_title, p_category, p_device, p_referrer);
+END;
+$$;

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { Geist, Geist_Mono } from "next/font/google";
 import {
   LayoutDashboard,
+  BarChart3,
   FileText,
   PlusCircle,
   ExternalLink,
@@ -35,6 +36,7 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
 
   const navLinks = [
     { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { label: "Articles", href: "/admin/posts", icon: FileText },
     { label: "New Article", href: "/admin/posts/new", icon: PlusCircle },
   ];

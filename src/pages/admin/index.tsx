@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import {
@@ -9,6 +9,7 @@ import {
   PlusCircle,
   ArrowRight,
   TrendingUp,
+  BarChart3,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
@@ -141,6 +142,36 @@ export default function AdminDashboard() {
               </div>
             );
           })}
+        </div>
+
+        {/* Analytics Shortcut Banner */}
+        <div className="rounded-xl border border-dashed border-[#FF5500]/30 bg-gradient-to-r from-[#FF5500]/10 via-black to-black p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#FF5500]/40 bg-[#FF5500]/20 text-[#FF5500]">
+              <BarChart3 size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-white">
+                  VISITOR_METRICS & INTERACTIVE_CHARTS
+                </span>
+                <span className="rounded bg-[#A3E635]/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#A3E635] border border-[#A3E635]/30">
+                  NEW
+                </span>
+              </div>
+              <p className="text-xs text-zinc-400 font-sans mt-0.5">
+                Inspect daily traffic trends, device distributions, and top performing pages.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/admin/analytics"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-white/20 bg-zinc-950 px-4 py-2 font-mono text-xs text-zinc-200 hover:border-[#FF5500] hover:text-[#FF5500] transition-colors shrink-0"
+          >
+            <span>[ OPEN ANALYTICS ]</span>
+            <ArrowRight size={12} />
+          </Link>
         </div>
 
         {/* Recent Articles Stream */}
