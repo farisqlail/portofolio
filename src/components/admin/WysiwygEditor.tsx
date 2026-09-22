@@ -4,6 +4,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
+import { marked } from "marked";
 import {
   Bold,
   Italic,
@@ -33,6 +34,31 @@ interface WysiwygEditorProps {
   placeholder?: string;
 }
 
+/**
+ * Automatically parse markdown text into HTML if needed
+ */
+function parseIfMarkdown(content: string): string {
+  if (!content) return "";
+  const trimmed = content.trim();
+  // Check if content appears to be raw markdown rather than HTML
+  if (
+    !trimmed.startsWith("<") &&
+    (trimmed.includes("#") ||
+      trimmed.includes("- ") ||
+      trimmed.includes("* ") ||
+      trimmed.includes("1. ") ||
+      trimmed.includes("```") ||
+      trimmed.includes("> "))
+  ) {
+    try {
+      return marked.parse(trimmed, { async: false }) as string;
+    } catch {
+      return content;
+    }
+  }
+  return content;
+}
+
 export default function WysiwygEditor({
   value,
   onChange,
@@ -51,6 +77,20 @@ export default function WysiwygEditor({
         heading: {
           levels: [2, 3],
         },
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+          HTMLAttributes: {
+            class: "list-disc pl-6 my-3",
+          },
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+          HTMLAttributes: {
+            class: "list-decimal pl-6 my-3",
+          },
+        },
       }),
       Underline,
       LinkExtension.configure({
@@ -67,7 +107,7 @@ export default function WysiwygEditor({
         },
       }),
     ],
-    content: value,
+    content: parseIfMarkdown(value),
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
@@ -75,7 +115,7 @@ export default function WysiwygEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[380px] p-5 focus:outline-none text-zinc-200 prose prose-invert max-w-none text-sm sm:text-base leading-relaxed prose-headings:font-bold prose-headings:text-white prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:border-b prose-h2:border-dashed prose-h2:border-white/10 prose-h2:pb-2 prose-h2:mt-6 prose-h3:text-lg sm:prose-h3:text-xl prose-h3:mt-4 prose-p:text-zinc-300 prose-p:leading-relaxed prose-code:font-mono prose-code:text-[#A3E635] prose-code:bg-white/[0.05] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-dashed prose-pre:border-white/20 prose-pre:rounded-xl prose-blockquote:border-l-2 prose-blockquote:border-[#FF5500] prose-blockquote:text-zinc-400 prose-blockquote:italic",
+          "min-h-[380px] p-5 focus:outline-none text-zinc-200 article-content prose prose-invert max-w-none text-sm sm:text-base leading-relaxed",
       },
     },
   });
@@ -85,7 +125,7 @@ export default function WysiwygEditor({
     if (!editor) return;
     const currentHtml = editor.getHTML();
     if (value && (editor.getText().trim() === "" || currentHtml === "<p></p>")) {
-      editor.commands.setContent(value);
+      editor.commands.setContent(parseIfMarkdown(value));
     }
   }, [value, editor]);
 
@@ -120,7 +160,7 @@ export default function WysiwygEditor({
 
   const handleSwitchToVisual = () => {
     if (editor) {
-      editor.commands.setContent(value);
+      editor.commands.setContent(parseIfMarkdown(value));
     }
     setMode("visual");
   };
@@ -192,10 +232,11 @@ export default function WysiwygEditor({
           <div className="flex items-center gap-0.5 border-r border-dashed border-white/15 pr-1.5 mr-1">
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("heading", { level: 2 })
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Heading 2"
@@ -204,10 +245,11 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("heading", { level: 3 })
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Heading 3"
@@ -220,10 +262,11 @@ export default function WysiwygEditor({
           <div className="flex items-center gap-0.5 border-r border-dashed border-white/15 pr-1.5 mr-1">
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleBold().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("bold")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Bold (Ctrl+B)"
@@ -232,10 +275,11 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleItalic().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("italic")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Italic (Ctrl+I)"
@@ -244,10 +288,11 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("underline")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Underline (Ctrl+U)"
@@ -256,10 +301,11 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleStrike().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("strike")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Strikethrough"
@@ -268,6 +314,7 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleCode().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("code")
@@ -284,34 +331,37 @@ export default function WysiwygEditor({
           <div className="flex items-center gap-0.5 border-r border-dashed border-white/15 pr-1.5 mr-1">
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("bulletList")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold shadow-sm"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
-              title="Bullet List"
+              title="Bullet List (List Titik)"
             >
               <List size={14} />
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("orderedList")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold shadow-sm"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
-              title="Numbered List"
+              title="Numbered List (List Angka)"
             >
               <ListOrdered size={14} />
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("blockquote")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Quote"
@@ -320,6 +370,7 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().toggleCodeBlock().run()}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("codeBlock")
@@ -332,6 +383,7 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().setHorizontalRule().run()}
               className="p-1.5 rounded transition-colors cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10"
               title="Horizontal Divider"
@@ -344,10 +396,11 @@ export default function WysiwygEditor({
           <div className="flex items-center gap-0.5 border-r border-dashed border-white/15 pr-1.5 mr-1">
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={handleSetLink}
               className={`p-1.5 rounded transition-colors cursor-pointer ${
                 editor.isActive("link")
-                  ? "bg-[#FF5500] text-black"
+                  ? "bg-[#FF5500] text-black font-bold"
                   : "text-zinc-400 hover:text-white hover:bg-white/10"
               }`}
               title="Insert / Edit Link"
@@ -357,6 +410,7 @@ export default function WysiwygEditor({
             {editor.isActive("link") && (
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => editor.chain().focus().unsetLink().run()}
                 className="p-1.5 rounded transition-colors cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10"
                 title="Remove Link"
@@ -366,6 +420,7 @@ export default function WysiwygEditor({
             )}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={handleInsertImage}
               className="p-1.5 rounded transition-colors cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10"
               title="Insert Image"
@@ -378,6 +433,7 @@ export default function WysiwygEditor({
           <div className="flex items-center gap-0.5">
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().undo()}
               className="p-1.5 rounded transition-colors cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
@@ -387,6 +443,7 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().redo()}
               className="p-1.5 rounded transition-colors cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
@@ -396,6 +453,7 @@ export default function WysiwygEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
               className="p-1.5 rounded transition-colors cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10"
               title="Clear Formatting"
@@ -436,7 +494,7 @@ export default function WysiwygEditor({
         </div>
         <div className="flex items-center gap-1.5 text-zinc-600">
           <span className="h-1.5 w-1.5 bg-[#FF5500]"></span>
-          <span>STYLED WITH STITCH BLUEPRINT</span>
+          <span>WYSIWYG ENGINE ACTIVE</span>
         </div>
       </div>
     </div>

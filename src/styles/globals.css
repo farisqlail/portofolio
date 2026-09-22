@@ -287,5 +287,216 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   display: none !important;
 }
 
+/* ==============================================================================
+   WYSIWYG EDITOR (TIPTAP / PROSEMIRROR) & BLOG ARTICLE TYPOGRAPHY
+   Overrides Tailwind v4 preflight CSS reset for lists, headings, and formatting
+   ============================================================================== */
 
+/* TipTap Editor Container */
+.tiptap.ProseMirror {
+  outline: none !important;
+  min-height: 380px;
+  color: #e4e4e7;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.7;
+}
 
+.tiptap.ProseMirror p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.75;
+}
+
+/* 1. Bullet Lists (Unordered) */
+.tiptap.ProseMirror ul,
+.article-content ul,
+.prose ul {
+  list-style-type: disc !important;
+  padding-left: 1.75rem !important;
+  margin-top: 0.75rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.tiptap.ProseMirror ul ul,
+.article-content ul ul,
+.prose ul ul {
+  list-style-type: circle !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+  padding-left: 1.5rem !important;
+}
+
+/* 2. Numbered Lists (Ordered) */
+.tiptap.ProseMirror ol,
+.article-content ol,
+.prose ol {
+  list-style-type: decimal !important;
+  padding-left: 1.75rem !important;
+  margin-top: 0.75rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.tiptap.ProseMirror ol ol,
+.article-content ol ol,
+.prose ol ol {
+  list-style-type: lower-alpha !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+  padding-left: 1.5rem !important;
+}
+
+/* 3. List Items */
+.tiptap.ProseMirror li,
+.article-content li,
+.prose li {
+  display: list-item !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.35rem !important;
+  padding-left: 0.25rem !important;
+  color: #d4d4d8 !important;
+  line-height: 1.65 !important;
+}
+
+.tiptap.ProseMirror li > p,
+.article-content li > p,
+.prose li > p {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  display: inline !important;
+}
+
+/* 4. Headings */
+.tiptap.ProseMirror h1,
+.article-content h1,
+.prose h1 {
+  font-size: 1.85rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-top: 2rem !important;
+  margin-bottom: 0.85rem !important;
+  letter-spacing: -0.02em !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2) !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.tiptap.ProseMirror h2,
+.article-content h2,
+.prose h2 {
+  font-size: 1.45rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.75rem !important;
+  letter-spacing: -0.015em !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12) !important;
+  padding-bottom: 0.4rem !important;
+}
+
+.tiptap.ProseMirror h3,
+.article-content h3,
+.prose h3 {
+  font-size: 1.2rem !important;
+  font-weight: 700 !important;
+  color: #f4f4f5 !important;
+  margin-top: 1.35rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* 5. Blockquotes */
+.tiptap.ProseMirror blockquote,
+.article-content blockquote,
+.prose blockquote {
+  border-left: 3px solid #FF5500 !important;
+  padding: 0.6rem 1rem !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 1.25rem !important;
+  color: #a1a1aa !important;
+  font-style: italic !important;
+  background: rgba(255, 85, 0, 0.05) !important;
+  border-radius: 0 0.5rem 0.5rem 0 !important;
+}
+
+/* 6. Code & Code Blocks */
+.tiptap.ProseMirror code,
+.article-content code,
+.prose code {
+  color: #A3E635 !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  padding: 0.15rem 0.4rem !important;
+  border-radius: 0.25rem !important;
+  font-family: var(--font-mono), monospace !important;
+  font-size: 0.875em !important;
+}
+
+.tiptap.ProseMirror pre,
+.article-content pre,
+.prose pre {
+  background: #050508 !important;
+  border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+  border-radius: 0.75rem !important;
+  padding: 1.1rem !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 1.25rem !important;
+  overflow-x: auto !important;
+}
+
+.tiptap.ProseMirror pre code,
+.article-content pre code,
+.prose pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: #f4f4f5 !important;
+  font-size: 0.875rem !important;
+}
+
+/* 7. Horizontal Divider */
+.tiptap.ProseMirror hr,
+.article-content hr,
+.prose hr {
+  border: none !important;
+  border-top: 1px dashed rgba(255, 255, 255, 0.2) !important;
+  margin: 2.25rem 0 !important;
+}
+
+/* 8. Text Decorations */
+.tiptap.ProseMirror strong,
+.article-content strong,
+.prose strong {
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.tiptap.ProseMirror em,
+.article-content em,
+.prose em {
+  font-style: italic !important;
+}
+
+.tiptap.ProseMirror u,
+.article-content u,
+.prose u {
+  text-decoration: underline !important;
+}
+
+.tiptap.ProseMirror s,
+.article-content s,
+.prose s {
+  text-decoration: line-through !important;
+  color: #71717a !important;
+}
+
+/* 9. Hyperlinks */
+.tiptap.ProseMirror a,
+.article-content a,
+.prose a {
+  color: #FF5500 !important;
+  text-decoration: underline !important;
+  text-decoration-style: dashed !important;
+  transition: color 0.15s ease;
+}
+
+.tiptap.ProseMirror a:hover,
+.article-content a:hover,
+.prose a:hover {
+  color: #ff7733 !important;
+}

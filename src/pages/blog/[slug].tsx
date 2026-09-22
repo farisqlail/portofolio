@@ -255,11 +255,12 @@ export default function BlogPostDetail({
               />
             </div>
 
-            {/* Article Content / Markdown Render */}
+            {/* Article Content / Markdown & WYSIWYG HTML Render */}
             <div
-              className="prose prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:border-b prose-h2:border-dashed prose-h2:border-white/10 prose-h2:pb-2 prose-h2:mt-8 prose-h3:text-lg sm:prose-h3:text-xl prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-sm sm:prose-p:text-base prose-a:text-[#FF5500] prose-a:underline prose-a:decoration-dashed prose-code:font-mono prose-code:text-[#A3E635] prose-code:bg-white/[0.05] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-zinc-950 prose-pre:border prose-pre:border-dashed prose-pre:border-white/20 prose-pre:rounded-xl prose-li:text-zinc-300 prose-li:text-sm sm:prose-li:text-base prose-table:border-collapse prose-th:border prose-th:border-dashed prose-th:border-white/20 prose-th:p-2 prose-th:bg-zinc-950 prose-td:border prose-td:border-dashed prose-td:border-white/15 prose-td:p-2"
+              className="article-content prose prose-invert max-w-none text-zinc-200 text-sm sm:text-base leading-relaxed"
               dangerouslySetInnerHTML={{ __html: renderedHtml }}
             />
+
 
             {/* In-Article Ad Slot (Mid Content) */}
             <AdSlot slotId="article-mid" format="in-article" className="my-8" />
