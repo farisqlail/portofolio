@@ -161,14 +161,6 @@ export default function BlueprintsPage({
         {/* Top Header / Hero Section */}
         <header className="relative z-10 border-b border-dashed border-white/10 pt-28 sm:pt-32 pb-12 sm:pb-16 bg-gradient-to-b from-black/80 via-[#07070c]/70 to-transparent">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Telemetry pill */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1 font-mono text-[11px] text-zinc-300 mb-5 backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#FF5500] animate-pulse" />
-              <span className="text-zinc-500">SPEC //</span>
-              <span className="text-[#FF5500] font-semibold">DIGITAL ARSENAL</span>
-              <span className="text-zinc-600">|</span>
-              <span className="text-zinc-400">3RD-PARTY FULFILLMENT</span>
-            </div>
 
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>

@@ -195,11 +195,6 @@ export default function BlogIndex({
         <main className="mx-auto max-w-6xl w-full px-4 sm:px-6 pt-28 sm:pt-36 pb-20 relative z-10 flex-1">
           {/* Page Header */}
           <div className="border-b border-dashed border-white/15 pb-6 sm:pb-8">
-            <div className="inline-flex items-center gap-2 rounded border border-[#FF5500]/40 bg-[#FF5500]/10 px-3 py-1 font-mono text-xs font-bold text-[#FF5500] uppercase tracking-wider mb-3">
-              <Sparkles size={12} className="text-[#FF5500]" />
-              <span>[ FIELD NOTES &amp; ARCHITECTURE SPECS ]</span>
-            </div>
-
             <div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-tight">
                 Engineering Notes &amp;{" "}
