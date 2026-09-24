@@ -15,6 +15,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   const staticPages = [
     { url: `${SITE_URL}`, lastmod: today, changefreq: "weekly", priority: "1.0" },
+    { url: `${SITE_URL}/blueprints`, lastmod: today, changefreq: "daily", priority: "0.9" },
     { url: `${SITE_URL}/blog`, lastmod: today, changefreq: "daily", priority: "0.9" },
     { url: `${SITE_URL}/hermes`, lastmod: today, changefreq: "monthly", priority: "0.8" },
     { url: `${SITE_URL}/hermes/downloads`, lastmod: today, changefreq: "weekly", priority: "0.7" },

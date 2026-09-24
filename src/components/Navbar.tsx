@@ -14,7 +14,9 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isBlog = router.pathname.startsWith("/blog");
-  const isTemplates = router.pathname.startsWith("/templates");
+  const isBlueprints =
+    router.pathname.startsWith("/blueprints") ||
+    router.pathname.startsWith("/templates");
 
   const handleSectionJump = (index: number, sectionId: string) => {
     if (router.pathname === "/") {
@@ -108,29 +110,29 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
           {/* Divider */}
           <span className="h-3 w-[1px] bg-white/15 mx-1" />
 
-          {/* Templates Store */}
+          {/* Blueprints Vault */}
           <Link
-            href="/templates"
+            href="/blueprints"
             className={`relative flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-mono font-medium transition-colors cursor-pointer ${
-              isTemplates
+              isBlueprints
                 ? "text-black font-bold"
                 : "text-zinc-400 hover:text-white"
             }`}
           >
-            {isTemplates && (
+            {isBlueprints && (
               <motion.div
                 layoutId="activePill"
                 className="absolute inset-0 rounded-full bg-[#FF5500] shadow-sm"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
-            <span className="relative z-10">Templates</span>
+            <span className="relative z-10">Blueprints</span>
             <span
               className={`relative z-10 text-[9px] px-1 py-0.2 rounded-full font-bold uppercase ${
-                isTemplates ? "bg-black text-[#FF5500]" : "bg-[#FF5500]/20 text-[#FF5500]"
+                isBlueprints ? "bg-black text-[#FF5500]" : "bg-[#FF5500]/20 text-[#FF5500]"
               }`}
             >
-              Shop
+              Vault
             </span>
           </Link>
 
@@ -223,17 +225,17 @@ export default function Navbar({ activeIndex = 0, onSelectCard }: NavbarProps) {
             <div className="my-1.5 border-t border-dashed border-white/15" />
 
             <Link
-              href="/templates"
+              href="/blueprints"
               onClick={() => setMobileOpen(false)}
               className={`w-full text-left rounded-xl px-3 py-2 transition-colors flex items-center justify-between ${
-                isTemplates
+                isBlueprints
                   ? "bg-[#FF5500] text-black font-bold"
                   : "text-[#FF5500] hover:bg-[#FF5500]/10"
               }`}
             >
-              <span>Templates Store (Gumroad)</span>
+              <span>The Blueprint Vault</span>
               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/40 text-white">
-                STORE
+                VAULT
               </span>
             </Link>
 
