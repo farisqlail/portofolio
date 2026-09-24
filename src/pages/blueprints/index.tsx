@@ -203,7 +203,10 @@ export default function BlueprintsPage({
             {/* Filter Tabs & Search Bar */}
             <div className="mt-8 pt-6 border-t border-dashed border-white/10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
               {/* Category pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none font-mono text-xs">
+              <div
+                className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none no-scrollbar font-mono text-xs"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
                 {CATEGORIES.map((cat) => {
                   const Icon = cat.icon;
                   const isActive = selectedCategory === cat.value;

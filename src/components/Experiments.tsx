@@ -38,7 +38,10 @@ export default function Experiments() {
       </div>
 
       {/* Mobile Horizontal Rail Selector (Visible only on mobile/tablet) */}
-      <div className="flex lg:hidden items-center gap-1.5 overflow-x-auto pb-1 shrink-0 scrollbar-none font-mono">
+      <div
+        className="flex lg:hidden items-center gap-1.5 overflow-x-auto pb-1 shrink-0 scrollbar-none no-scrollbar font-mono"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         {experiments.map((exp, idx) => {
           const isSelected = exp.slug === currentExp.slug;
           return (

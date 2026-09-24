@@ -219,7 +219,10 @@ export default function BlogIndex({
           {/* Controls: Search & Category Chips */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 my-6">
             {/* Category Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none font-mono">
+            <div
+              className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar font-mono"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
               {categories.map((cat) => {
                 const isSelected = selectedCategory === cat;
                 return (
