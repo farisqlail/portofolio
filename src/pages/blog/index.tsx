@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -13,6 +13,8 @@ import {
   Tag,
   ArrowRight,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -75,6 +77,87 @@ export default function BlogIndex({
       return matchCat && matchQuery;
     });
   }, [posts, selectedCategory, searchQuery]);
+
+  // Horizontal scroller controls
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0 && el.scrollWidth > el.clientWidth) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+        checkScroll();
+      }
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("scroll", checkScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", checkScroll);
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("scroll", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scrollByAmount = (amount: number) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+    setTimeout(checkScroll, 300);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    setStartX(e.pageX - el.offsetLeft);
+    setScrollLeft(el.scrollLeft);
+    setHasMoved(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    if (Math.abs(walk) > 4) {
+      setHasMoved(true);
+    }
+    el.scrollLeft = scrollLeft - walk;
+    checkScroll();
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleCategoryClick = (cat: string) => {
+    if (hasMoved) return;
+    setSelectedCategory(cat);
+  };
 
   return (
     <>
@@ -213,27 +296,64 @@ export default function BlogIndex({
 
           {/* Controls: Search & Category Chips */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 my-6">
-            {/* Category Chips */}
-            <div
-              className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none no-scrollbar font-mono"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {categories.map((cat) => {
-                const isSelected = selectedCategory === cat;
-                return (
+            {/* Category Chips Scroller */}
+            <div className="relative flex-1 min-w-0 flex items-center group">
+              {/* Left arrow with fade */}
+              {canScrollLeft && (
+                <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center pr-3 pl-0 bg-gradient-to-r from-[#07070a] via-[#07070a]/90 to-transparent pointer-events-auto">
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`rounded px-3 py-1 text-xs whitespace-nowrap transition-all cursor-pointer ${
-                      isSelected
-                        ? "border border-[#FF5500] bg-[#FF5500] text-black font-bold shadow-sm"
-                        : "border border-dashed border-white/15 bg-black/40 text-zinc-400 hover:text-white hover:border-white/30"
-                    }`}
+                    type="button"
+                    onClick={() => scrollByAmount(-180)}
+                    className="h-6 w-6 rounded border border-white/20 bg-black/90 text-zinc-300 hover:text-white hover:border-[#FF5500] hover:bg-[#FF5500]/10 flex items-center justify-center transition-all shadow-md cursor-pointer"
+                    aria-label="Scroll left"
                   >
-                    [ {cat} ]
+                    <ChevronLeft size={13} />
                   </button>
-                );
-              })}
+                </div>
+              )}
+
+              {/* Scrollable Track */}
+              <div
+                ref={scrollContainerRef}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUpOrLeave}
+                onMouseLeave={handleMouseUpOrLeave}
+                className="flex items-center gap-1.5 overflow-x-auto pb-1 font-mono text-xs select-none touch-pan-x cursor-grab active:cursor-grabbing scroll-smooth w-full no-scrollbar scrollbar-none"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {categories.map((cat) => {
+                  const isSelected = selectedCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => handleCategoryClick(cat)}
+                      className={`rounded px-3 py-1 text-xs whitespace-nowrap transition-all cursor-pointer select-none shrink-0 ${
+                        isSelected
+                          ? "border border-[#FF5500] bg-[#FF5500] text-black font-bold shadow-sm"
+                          : "border border-dashed border-white/15 bg-black/40 text-zinc-400 hover:text-white hover:border-white/30"
+                      }`}
+                    >
+                      [ {cat} ]
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right arrow with fade */}
+              {canScrollRight && (
+                <div className="absolute right-0 top-0 bottom-0 z-20 flex items-center pl-3 pr-0 bg-gradient-to-l from-[#07070a] via-[#07070a]/90 to-transparent pointer-events-auto">
+                  <button
+                    type="button"
+                    onClick={() => scrollByAmount(180)}
+                    className="h-6 w-6 rounded border border-white/20 bg-black/90 text-zinc-300 hover:text-white hover:border-[#FF5500] hover:bg-[#FF5500]/10 flex items-center justify-center transition-all shadow-md cursor-pointer"
+                    aria-label="Scroll right"
+                  >
+                    <ChevronRight size={13} />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Search Input */}

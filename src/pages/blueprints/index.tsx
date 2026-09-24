@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -16,6 +16,8 @@ import {
   UserCheck,
   CheckCircle2,
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -81,6 +83,88 @@ export default function BlueprintsPage({
 
   const baseUrl = SITE_URL.replace(/\/$/, "");
   const pageUrl = `${baseUrl}/blueprints`;
+
+  // Horizontal scroller controls (Drag-to-scroll, wheel-to-horizontal, and arrows without visible scrollbar)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+
+    // Mouse wheel horizontal scroll listener (translates vertical wheel to horizontal scroll)
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY !== 0 && el.scrollWidth > el.clientWidth) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+        checkScroll();
+      }
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("scroll", checkScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", checkScroll);
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("scroll", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scrollByAmount = (amount: number) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+    setTimeout(checkScroll, 300);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    setStartX(e.pageX - el.offsetLeft);
+    setScrollLeft(el.scrollLeft);
+    setHasMoved(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    if (Math.abs(walk) > 4) {
+      setHasMoved(true);
+    }
+    el.scrollLeft = scrollLeft - walk;
+    checkScroll();
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleCategoryClick = (val: string) => {
+    if (hasMoved) return;
+    setSelectedCategory(val);
+  };
 
   return (
     <>
@@ -194,33 +278,70 @@ export default function BlueprintsPage({
 
             {/* Filter Tabs & Search Bar */}
             <div className="mt-8 pt-6 border-t border-dashed border-white/10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-              {/* Category pills */}
-              <div
-                className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none no-scrollbar font-mono text-xs"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
-                {CATEGORIES.map((cat) => {
-                  const Icon = cat.icon;
-                  const isActive = selectedCategory === cat.value;
-                  return (
+              {/* Category pills scroller with arrows, drag-to-scroll, wheel-to-scroll, without scrollbar */}
+              <div className="relative flex-1 min-w-0 flex items-center group">
+                {/* Left arrow with fade mask */}
+                {canScrollLeft && (
+                  <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center pr-4 pl-0 bg-gradient-to-r from-[#060608] via-[#060608]/90 to-transparent pointer-events-auto">
                     <button
-                      key={cat.value}
-                      onClick={() => setSelectedCategory(cat.value)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border whitespace-nowrap transition-all cursor-pointer ${
-                        isActive
-                          ? "border-[#FF5500] bg-[#FF5500]/10 text-white font-medium shadow-[0_0_12px_rgba(255,85,0,0.2)]"
-                          : "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20 hover:text-white"
-                      }`}
+                      type="button"
+                      onClick={() => scrollByAmount(-220)}
+                      className="h-7 w-7 rounded-lg border border-white/20 bg-black/90 text-zinc-300 hover:text-white hover:border-[#FF5500] hover:bg-[#FF5500]/10 flex items-center justify-center transition-all shadow-lg cursor-pointer"
+                      aria-label="Scroll left"
                     >
-                      <Icon size={12} className={isActive ? "text-[#FF5500]" : "text-zinc-500"} />
-                      <span>{cat.label}</span>
+                      <ChevronLeft size={14} />
                     </button>
-                  );
-                })}
+                  </div>
+                )}
+
+                {/* Scrollable Pills Track */}
+                <div
+                  ref={scrollContainerRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
+                  className="flex items-center gap-1.5 overflow-x-auto pb-1.5 lg:pb-0 font-mono text-xs select-none touch-pan-x cursor-grab active:cursor-grabbing scroll-smooth w-full no-scrollbar scrollbar-none"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {CATEGORIES.map((cat) => {
+                    const Icon = cat.icon;
+                    const isActive = selectedCategory === cat.value;
+                    return (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => handleCategoryClick(cat.value)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border whitespace-nowrap transition-all cursor-pointer select-none shrink-0 ${
+                          isActive
+                            ? "border-[#FF5500] bg-[#FF5500]/10 text-white font-medium shadow-[0_0_12px_rgba(255,85,0,0.2)]"
+                            : "border-white/10 bg-black/40 text-zinc-400 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <Icon size={12} className={isActive ? "text-[#FF5500]" : "text-zinc-500"} />
+                        <span>{cat.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Right arrow with fade mask */}
+                {canScrollRight && (
+                  <div className="absolute right-0 top-0 bottom-0 z-20 flex items-center pl-4 pr-0 bg-gradient-to-l from-[#060608] via-[#060608]/90 to-transparent pointer-events-auto">
+                    <button
+                      type="button"
+                      onClick={() => scrollByAmount(220)}
+                      className="h-7 w-7 rounded-lg border border-white/20 bg-black/90 text-zinc-300 hover:text-white hover:border-[#FF5500] hover:bg-[#FF5500]/10 flex items-center justify-center transition-all shadow-lg cursor-pointer"
+                      aria-label="Scroll right"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Search box */}
-              <div className="relative min-w-[260px] sm:min-w-[300px]">
+              <div className="relative min-w-[240px] sm:min-w-[280px] shrink-0">
                 <Search
                   size={14}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
