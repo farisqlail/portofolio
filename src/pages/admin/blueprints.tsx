@@ -19,6 +19,10 @@ import {
   Edit2,
   X,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Image as ImageIcon,
+  Check,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
@@ -42,6 +46,16 @@ const PLATFORMS: BlueprintPlatform[] = [
   "Custom",
 ];
 
+const PRESET_COVERS = [
+  { label: "Engineering", url: "/assets/images/categories/engineering.jpg" },
+  { label: "AI & Agents", url: "/assets/images/categories/ai-ml.jpg" },
+  { label: "Architecture", url: "/assets/images/categories/architecture.jpg" },
+  { label: "Web3", url: "/assets/images/categories/web3.jpg" },
+  { label: "Hermes UI", url: "/assets/images/lab/hermes/01-dashboard.png" },
+];
+
+const QUICK_PRICES = ["Free", "$19", "$29", "$49", "Rp 99.000", "Rp 149.000"];
+
 export default function AdminBlueprints() {
   const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,6 +69,7 @@ export default function AdminBlueprints() {
   // Form Fields
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [isCustomSlug, setIsCustomSlug] = useState(false);
   const [summary, setSummary] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string>("Starters & Code");
@@ -70,6 +85,10 @@ export default function AdminBlueprints() {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isPublished, setIsPublished] = useState(true);
 
+  // UI Simplifiers
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+
   // Slugify helper
   const slugify = (text: string) =>
     text
@@ -81,9 +100,19 @@ export default function AdminBlueprints() {
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
-    if (!editingId) {
+    if (!editingId && !isCustomSlug) {
       setSlug(slugify(val));
     }
+  };
+
+  const handlePurchaseUrlChange = (val: string) => {
+    setPurchaseUrl(val);
+    const lower = val.toLowerCase();
+    if (lower.includes("gumroad.com")) setPlatform("Gumroad");
+    else if (lower.includes("lynk.id")) setPlatform("Lynk.id");
+    else if (lower.includes("lemonsqueezy.com")) setPlatform("LemonSqueezy");
+    else if (lower.includes("github.com")) setPlatform("GitHub");
+    else if (lower.includes("cal.com")) setPlatform("Cal.com");
   };
 
   // Fetch blueprints from Supabase
@@ -125,6 +154,7 @@ export default function AdminBlueprints() {
     setEditingId(null);
     setTitle("");
     setSlug("");
+    setIsCustomSlug(false);
     setSummary("");
     setDescription("");
     setCategory("Starters & Code");
@@ -138,6 +168,8 @@ export default function AdminBlueprints() {
     setImageUrl("/assets/images/categories/engineering.jpg");
     setImageFile(null);
     setIsPublished(true);
+    setShowAdvanced(false);
+    setShowUrlInput(false);
     setIsModalOpen(false);
   };
 
@@ -145,6 +177,7 @@ export default function AdminBlueprints() {
     setEditingId(item.id);
     setTitle(item.title);
     setSlug(item.slug);
+    setIsCustomSlug(true);
     setSummary(item.summary);
     setDescription(item.description || "");
     setCategory(item.category);
@@ -157,15 +190,19 @@ export default function AdminBlueprints() {
     setHighlightsInput(item.highlights ? item.highlights.join("\n") : "");
     setImageUrl(item.cover_image);
     setIsPublished(item.is_published);
+    setShowAdvanced(false);
+    setShowUrlInput(false);
     setIsModalOpen(true);
   };
 
-  // Image upload to Supabase Storage
+  // Image upload to Supabase Storage with instant local preview fallback
   const handleImageFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setImageFile(file);
+    const localUrl = URL.createObjectURL(file);
+    setImageUrl(localUrl);
 
     if (isSupabaseConfigured) {
       setIsUploadingImage(true);
@@ -200,8 +237,8 @@ export default function AdminBlueprints() {
   // Save blueprint (Insert / Update)
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !purchaseUrl.trim() || !summary.trim()) {
-      setStatusMessage({ type: "error", text: "Please fill in title, summary, and external purchase URL." });
+    if (!title.trim() || !purchaseUrl.trim()) {
+      setStatusMessage({ type: "error", text: "Mohon isi Nama Produk dan Link Checkout." });
       return;
     }
 
@@ -218,20 +255,22 @@ export default function AdminBlueprints() {
       .map((h) => h.trim())
       .filter(Boolean);
 
+    const finalSummary = summary.trim() || `${title.trim()} - Digital template & boilerplate.`;
+
     const payload = {
       title: title.trim(),
-      slug: slug.trim() || slugify(title),
-      summary: summary.trim(),
+      slug: slug.trim() || slugify(title) || `blueprint-${Date.now()}`,
+      summary: finalSummary,
       description: description.trim(),
       category,
       platform,
       badge: badge.trim() ? badge.trim().toUpperCase() : null,
-      price_display: priceDisplay.trim(),
+      price_display: priceDisplay.trim() || "Free",
       purchase_url: purchaseUrl.trim(),
       preview_url: previewUrl.trim() ? previewUrl.trim() : null,
       cover_image: imageUrl.trim() || "/assets/images/categories/engineering.jpg",
-      tech_stack: techStackArray,
-      highlights: highlightsArray,
+      tech_stack: techStackArray.length > 0 ? techStackArray : ["Next.js", "TypeScript", "Tailwind CSS"],
+      highlights: highlightsArray.length > 0 ? highlightsArray : ["Production Ready Architecture", "Full Documentation Included"],
       is_published: isPublished,
       updated_at: new Date().toISOString(),
     };
@@ -536,196 +575,158 @@ export default function AdminBlueprints() {
 
         {/* Modal Form for Add / Edit */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-            <div className="relative w-full max-w-2xl my-8 rounded-2xl border border-dashed border-white/20 bg-[#0d0d14] p-6 sm:p-8 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-dashed border-white/10 pb-4 mb-6">
-                <div>
-                  <h2 className="font-mono text-lg font-bold text-white">
-                    {editingId ? "Edit Blueprint" : "Publish New Blueprint"}
-                  </h2>
-                  <p className="text-xs text-zinc-400 mt-0.5">
-                    Specify title, category, external checkout URL, and presentation.
-                  </p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+            <div className="relative w-full max-w-xl my-6 rounded-2xl border border-dashed border-white/20 bg-[#0c0c14] p-5 sm:p-7 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-dashed border-white/10 pb-4 mb-4 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-8 w-8 rounded-lg border border-[#FF5500]/40 bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500] font-mono font-bold text-xs">
+                    {editingId ? "EDIT" : "+"}
+                  </div>
+                  <div>
+                    <h2 className="font-mono text-base font-bold text-white">
+                      {editingId ? "Edit Blueprint / Template" : "Publish Blueprint Baru"}
+                    </h2>
+                    <p className="text-[11px] text-zinc-400">
+                      Cukup isi nama, link Gumroad, harga, dan gambar cover.
+                    </p>
+                  </div>
                 </div>
                 <button
+                  type="button"
                   onClick={resetForm}
-                  className="rounded-lg p-1.5 border border-white/10 text-zinc-400 hover:text-white"
+                  className="rounded-lg p-1.5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-colors cursor-pointer"
                 >
-                  <X size={16} />
+                  <X size={15} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4 font-mono text-xs">
-                {/* Title & Slug */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Form Body (Scrollable) */}
+              <form onSubmit={handleSubmit} className="space-y-4 font-mono text-xs overflow-y-auto pr-1">
+                {/* 1. Title & Category */}
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-zinc-400 mb-1">Title *</label>
+                    <label className="block text-zinc-300 font-bold mb-1">
+                      Nama Template / Blueprint *
+                    </label>
                     <input
                       type="text"
                       required
                       value={title}
                       onChange={(e) => handleTitleChange(e.target.value)}
                       placeholder="e.g. Next.js SaaS Starter"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                      className="w-full rounded-xl border border-white/15 bg-black/60 px-3.5 py-2.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none transition-colors"
                     />
+                    {slug && (
+                      <div className="mt-1 text-[10px] text-zinc-500 font-sans">
+                        URL Slug: <span className="font-mono text-zinc-400">/blueprints/{slug}</span>
+                      </div>
+                    )}
                   </div>
 
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Slug *</label>
-                    <input
-                      type="text"
-                      required
-                      value={slug}
-                      onChange={(e) => setSlug(slugify(e.target.value))}
-                      placeholder="e.g. nextjs-saas-starter"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-zinc-300 font-bold mb-1">
+                        Kategori *
+                      </label>
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-xs text-white focus:border-[#FF5500] focus:outline-none transition-colors"
+                      >
+                        {CATEGORIES.map((cat) => (
+                          <option key={cat} value={cat} className="bg-[#0c0c14]">
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-zinc-300 font-bold">
+                          Harga *
+                        </label>
+                        <div className="flex items-center gap-1">
+                          {QUICK_PRICES.slice(0, 4).map((p) => (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => setPriceDisplay(p)}
+                              className={`px-1.5 py-0.5 rounded text-[9px] border transition-colors ${
+                                priceDisplay === p
+                                  ? "border-[#A3E635] bg-[#A3E635]/20 text-[#A3E635]"
+                                  : "border-white/10 bg-white/5 text-zinc-400 hover:text-white"
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        value={priceDisplay}
+                        onChange={(e) => setPriceDisplay(e.target.value)}
+                        placeholder="e.g. $29 atau Rp 149.000"
+                        className="w-full rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none transition-colors"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Category & Platform */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Category *</label>
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white focus:border-[#FF5500] focus:outline-none"
-                    >
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat} className="bg-black">
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Fulfillment Platform *</label>
-                    <select
-                      value={platform}
-                      onChange={(e) => setPlatform(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white focus:border-[#FF5500] focus:outline-none"
-                    >
-                      {PLATFORMS.map((plat) => (
-                        <option key={plat} value={plat} className="bg-black">
-                          {plat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Price Display & Badge */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-zinc-400 mb-1">
-                      Price Display Label * (e.g. $29, Rp 149.000, Free)
+                {/* 2. Link Checkout Gumroad */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-zinc-300 font-bold">
+                      Link Checkout / Penjualan (Gumroad / Lynk.id) *
                     </label>
-                    <input
-                      type="text"
-                      required
-                      value={priceDisplay}
-                      onChange={(e) => setPriceDisplay(e.target.value)}
-                      placeholder="e.g. $29 or Rp 149.000 or Free"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-[#FF5500]/10 border border-[#FF5500]/30 text-[#FF5500]">
+                      {platform}
+                    </span>
                   </div>
-
-                  <div>
-                    <label className="block text-zinc-400 mb-1">
-                      Badge (Optional: FEATURED, NEW, BESTSELLER, LIMITED)
-                    </label>
-                    <input
-                      type="text"
-                      value={badge}
-                      onChange={(e) => setBadge(e.target.value)}
-                      placeholder="e.g. FEATURED"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Purchase URL & Preview URL */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-zinc-400 mb-1">
-                      External Checkout / Booking URL * (Gumroad, Lynk.id, Cal.com)
-                    </label>
+                  <div className="relative">
+                    <LinkIcon size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
                     <input
                       type="url"
                       required
                       value={purchaseUrl}
-                      onChange={(e) => setPurchaseUrl(e.target.value)}
+                      onChange={(e) => handlePurchaseUrlChange(e.target.value)}
                       placeholder="https://gumroad.com/l/your-product"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Live Demo URL (Optional)</label>
-                    <input
-                      type="url"
-                      value={previewUrl}
-                      onChange={(e) => setPreviewUrl(e.target.value)}
-                      placeholder="https://your-demo.vercel.app"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                      className="w-full rounded-xl border border-white/15 bg-black/60 pl-9 pr-3 py-2.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
 
-                {/* Summary */}
-                <div>
-                  <label className="block text-zinc-400 mb-1">Short Summary (1-2 sentences) *</label>
-                  <textarea
-                    required
-                    rows={2}
-                    value={summary}
-                    onChange={(e) => setSummary(e.target.value)}
-                    placeholder="Brief description for the catalog card..."
-                    className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                  />
-                </div>
+                {/* 3. Cover Image (Visual Preview + 1-Click Upload + Presets) */}
+                <div className="space-y-2">
+                  <label className="block text-zinc-300 font-bold">
+                    Foto / Cover Image Preview
+                  </label>
+                  
+                  <div className="relative h-32 w-full rounded-xl overflow-hidden border border-dashed border-white/20 bg-black/60 group flex items-center justify-center">
+                    {imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={imageUrl}
+                        alt="Cover Preview"
+                        className="h-full w-full object-cover transition-opacity group-hover:opacity-60"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-zinc-500 text-xs">
+                        <ImageIcon size={22} className="mb-1 text-zinc-600" />
+                        <span>Belum ada gambar</span>
+                      </div>
+                    )}
 
-                {/* Tech Stack & Highlights */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Tech Stack (comma-separated)</label>
-                    <input
-                      type="text"
-                      value={techStackInput}
-                      onChange={(e) => setTechStackInput(e.target.value)}
-                      placeholder="Next.js 16, TypeScript, Supabase"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-zinc-400 mb-1">Key Highlights (1 per line)</label>
-                    <textarea
-                      rows={2}
-                      value={highlightsInput}
-                      onChange={(e) => setHighlightsInput(e.target.value)}
-                      placeholder="High Performance&#10;Stitch Dark UI"
-                      className="w-full rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Cover Image Upload / URL */}
-                <div>
-                  <label className="block text-zinc-400 mb-1">Cover Image URL or Upload</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                      placeholder="/assets/images/categories/engineering.jpg"
-                      className="flex-1 rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
-                    />
-                    <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-dashed border-white/20 bg-white/5 px-3 py-2 text-zinc-300 hover:text-white hover:border-white/40">
-                      <Upload size={13} />
-                      <span>{isUploadingImage ? "Uploading..." : "Upload"}</span>
+                    {/* Hover / Overlay Upload Button */}
+                    <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <Upload size={18} className="text-[#FF5500] mb-1" />
+                      <span className="text-xs text-white font-bold">
+                        {isUploadingImage ? "Mengunggah..." : "Pilih Gambar Baru (Klik / Upload)"}
+                      </span>
+                      <span className="text-[10px] text-zinc-400">JPG, PNG, WebP</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -734,10 +735,165 @@ export default function AdminBlueprints() {
                       />
                     </label>
                   </div>
+
+                  {/* Quick Preset Selector & URL input toggle */}
+                  <div className="flex flex-wrap items-center justify-between gap-1.5 pt-0.5 text-[11px]">
+                    <div className="flex flex-wrap items-center gap-1">
+                      <span className="text-zinc-500 text-[10px]">Preset:</span>
+                      {PRESET_COVERS.map((preset) => (
+                        <button
+                          key={preset.url}
+                          type="button"
+                          onClick={() => setImageUrl(preset.url)}
+                          className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
+                            imageUrl === preset.url
+                              ? "border-[#FF5500] bg-[#FF5500]/15 text-[#FF5500]"
+                              : "border-white/10 bg-white/5 text-zinc-400 hover:text-white"
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowUrlInput(!showUrlInput)}
+                      className="text-zinc-400 hover:text-white underline text-[10px] cursor-pointer"
+                    >
+                      {showUrlInput ? "Tutup input URL" : "Paste URL luar"}
+                    </button>
+                  </div>
+
+                  {showUrlInput && (
+                    <input
+                      type="text"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full rounded-lg border border-white/10 bg-black/60 px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                    />
+                  )}
                 </div>
 
-                {/* Published Toggle */}
-                <div className="flex items-center gap-2 pt-2">
+                {/* 4. Short Summary */}
+                <div className="space-y-1">
+                  <label className="block text-zinc-300 font-bold">
+                    Deskripsi Singkat (Summary)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
+                    placeholder="Contoh: Boilerplate Next.js 16 siap pakai dengan autentikasi Supabase dan dark theme modern."
+                    className="w-full rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none transition-colors"
+                  />
+                </div>
+
+                {/* 5. Collapsible Advanced Options */}
+                <div className="border border-dashed border-white/15 rounded-xl overflow-hidden bg-black/40">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="w-full px-3.5 py-2.5 flex items-center justify-between text-left text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={12} className="text-[#FF5500]" />
+                      <span className="font-bold text-[11px]">
+                        {showAdvanced ? "Sembunyikan Opsi Tambahan" : "+ Opsi Tambahan (Demo URL, Tech Stack, Badge, Slug)"}
+                      </span>
+                    </div>
+                    {showAdvanced ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  </button>
+
+                  {showAdvanced && (
+                    <div className="p-3.5 pt-1 space-y-3 border-t border-dashed border-white/10">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-zinc-400 mb-1">Live Demo URL</label>
+                          <input
+                            type="url"
+                            value={previewUrl}
+                            onChange={(e) => setPreviewUrl(e.target.value)}
+                            placeholder="https://demo.vercel.app"
+                            className="w-full rounded-lg border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-zinc-400 mb-1">Badge Produk</label>
+                          <select
+                            value={badge}
+                            onChange={(e) => setBadge(e.target.value)}
+                            className="w-full rounded-lg border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-white focus:border-[#FF5500] focus:outline-none"
+                          >
+                            <option value="" className="bg-[#0c0c14]">Tanpa Badge</option>
+                            <option value="NEW" className="bg-[#0c0c14]">NEW</option>
+                            <option value="FEATURED" className="bg-[#0c0c14]">FEATURED</option>
+                            <option value="BESTSELLER" className="bg-[#0c0c14]">BESTSELLER</option>
+                            <option value="LIMITED" className="bg-[#0c0c14]">LIMITED</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-zinc-400 mb-1">Tech Stack (koma terpisah)</label>
+                          <input
+                            type="text"
+                            value={techStackInput}
+                            onChange={(e) => setTechStackInput(e.target.value)}
+                            placeholder="Next.js 16, TypeScript, Tailwind"
+                            className="w-full rounded-lg border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-zinc-400 mb-1">Platform Fulfill</label>
+                          <select
+                            value={platform}
+                            onChange={(e) => setPlatform(e.target.value)}
+                            className="w-full rounded-lg border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-white focus:border-[#FF5500] focus:outline-none"
+                          >
+                            {PLATFORMS.map((plat) => (
+                              <option key={plat} value={plat} className="bg-[#0c0c14]">
+                                {plat}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-zinc-400 mb-1">Key Highlights (1 baris per poin)</label>
+                        <textarea
+                          rows={2}
+                          value={highlightsInput}
+                          onChange={(e) => setHighlightsInput(e.target.value)}
+                          placeholder="Production Ready&#10;Full Documentation Included"
+                          className="w-full rounded-lg border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-zinc-400 mb-1">Custom Slug</label>
+                        <input
+                          type="text"
+                          value={slug}
+                          onChange={(e) => {
+                            setIsCustomSlug(true);
+                            setSlug(slugify(e.target.value));
+                          }}
+                          placeholder="nextjs-saas-starter"
+                          className="w-full rounded-lg border border-white/10 bg-black/60 px-2.5 py-1.5 text-xs text-white placeholder-zinc-600 focus:border-[#FF5500] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Published Checkbox */}
+                <div className="flex items-center gap-2 pt-1">
                   <input
                     type="checkbox"
                     id="isPublished"
@@ -745,26 +901,36 @@ export default function AdminBlueprints() {
                     onChange={(e) => setIsPublished(e.target.checked)}
                     className="h-4 w-4 rounded border-zinc-700 bg-black text-[#FF5500] focus:ring-0 cursor-pointer"
                   />
-                  <label htmlFor="isPublished" className="text-zinc-300 cursor-pointer">
-                    Publish immediately to Vault (Live)
+                  <label htmlFor="isPublished" className="text-zinc-300 text-xs cursor-pointer select-none">
+                    Publikasikan langsung ke Vault (Live)
                   </label>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-dashed border-white/10">
+                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-dashed border-white/10 shrink-0">
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-zinc-400 hover:text-white cursor-pointer"
+                    className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
                   >
-                    Cancel
+                    Batal
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="rounded-xl border border-[#FF5500] bg-[#FF5500] px-5 py-2 font-bold text-black hover:bg-[#e04b00] disabled:opacity-50 cursor-pointer shadow-lg"
+                    className="inline-flex items-center gap-2 rounded-xl border border-[#FF5500] bg-[#FF5500] px-5 py-2 font-mono text-xs font-bold text-black hover:bg-[#ff6a1f] disabled:opacity-50 cursor-pointer shadow-lg transition-colors"
                   >
-                    {isSubmitting ? "Saving..." : editingId ? "Save Changes" : "Create Blueprint"}
+                    {isSubmitting ? (
+                      <>
+                        <RefreshCw size={13} className="animate-spin" />
+                        <span>Menyimpan...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check size={13} />
+                        <span>{editingId ? "Simpan Perubahan" : "Publikasikan Blueprint"}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
