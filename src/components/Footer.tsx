@@ -14,8 +14,15 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Legal & Navigation Links (Google AdSense Mandatory) */}
+        {/* Legal & Navigation Links (Google AdSense Mandatory & Internal Link Equity) */}
         <div className="flex items-center flex-wrap justify-center gap-4 text-[11px]">
+          <Link
+            href="/blueprints"
+            className="text-zinc-400 hover:text-[#FF5500] transition-colors"
+          >
+            Blueprints
+          </Link>
+          <span className="text-zinc-700">/</span>
           <Link
             href="/blog"
             className="text-zinc-400 hover:text-white transition-colors"

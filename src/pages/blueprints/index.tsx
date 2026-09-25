@@ -166,6 +166,126 @@ export default function BlueprintsPage({
     setSelectedCategory(val);
   };
 
+  const parseNumericPrice = (priceStr?: string): number => {
+    if (!priceStr || priceStr.toLowerCase().includes("free")) return 0;
+    if (priceStr.includes("Rp") || priceStr.toUpperCase().includes("IDR")) {
+      const digitsOnly = priceStr.replace(/[^0-9]/g, "");
+      return digitsOnly ? parseInt(digitsOnly, 10) : 0;
+    }
+    const cleaned = priceStr.replace(/[^0-9.]/g, "");
+    const val = parseFloat(cleaned);
+    return isNaN(val) ? 0 : val;
+  };
+
+  const getPriceCurrency = (priceStr?: string): string => {
+    if (!priceStr) return "USD";
+    if (priceStr.includes("Rp") || priceStr.toUpperCase().includes("IDR")) return "IDR";
+    return "USD";
+  };
+
+  const schemaStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${pageUrl}#webpage`,
+        "url": pageUrl,
+        "name": "The Blueprint Vault · Digital Assets, AI Agents & Code · Faris Rizqilail",
+        "description":
+          "Universal catalog of production-ready code starters, AI agent skills, system architecture runbooks, developer utilities, and 1-on-1 technical advisory by Faris Rizqilail.",
+        "inLanguage": "en-US",
+        "isPartOf": {
+          "@type": "WebSite",
+          "@id": `${baseUrl}/#website`,
+          "name": "Faris Rizqilail | LailDev",
+          "url": baseUrl,
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "LailDev",
+          "url": baseUrl,
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${baseUrl}/assets/icons/logo.png`,
+          },
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Faris Rizqilail",
+          "url": baseUrl,
+          "jobTitle": "Software Engineer & Founder @LailDev",
+          "sameAs": [
+            "https://github.com/farisqlail",
+            "https://linkedin.com/in/farisqlail",
+            "https://x.com/LailDev",
+          ],
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": baseUrl,
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "The Blueprint Vault",
+            "item": pageUrl,
+          },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#catalog`,
+        "name": "The Blueprint Vault - Digital Artifacts & Code Catalog",
+        "description":
+          "Curated production-ready templates, AI agent skills, and system architecture runbooks.",
+        "numberOfItems": blueprints.length,
+        "itemListElement": blueprints.map((item, idx) => {
+          const itemCover = item.cover_image?.startsWith("http")
+            ? item.cover_image
+            : `${baseUrl}/${item.cover_image.replace(/^\//, "")}`;
+          const isService = item.category === "Advisory & Services";
+          const numericPrice = parseNumericPrice(item.price_display);
+          const currency = getPriceCurrency(item.price_display);
+          const itemUrl = item.purchase_url || pageUrl;
+
+          return {
+            "@type": "ListItem",
+            "position": idx + 1,
+            "item": {
+              "@type": isService ? "Service" : "SoftwareApplication",
+              "@id": `${pageUrl}#${item.slug || item.id}`,
+              "name": item.title,
+              "description": item.summary,
+              "image": itemCover,
+              "url": itemUrl,
+              "applicationCategory": item.category,
+              "operatingSystem": "All",
+              "offers": {
+                "@type": "Offer",
+                "price": numericPrice,
+                "priceCurrency": currency,
+                "availability": "https://schema.org/InStock",
+                "url": itemUrl,
+                "seller": {
+                  "@type": "Person",
+                  "name": "Faris Rizqilail",
+                  "url": baseUrl,
+                },
+              },
+            },
+          };
+        }),
+      },
+    ],
+  };
+
   return (
     <>
       <Head>
@@ -176,7 +296,7 @@ export default function BlueprintsPage({
         />
         <meta
           name="keywords"
-          content="Next.js Templates, AI Agent Skills, System Architecture Runbook, Gumroad, Cal.com, Developer Tools, Faris Rizqilail, LailDev"
+          content="Next.js 16 Templates, Awwwards Website Templates, AI Agent Skills, System Architecture Runbook, Gumroad Templates, React Templates, Developer Boilerplates, Faris Rizqilail, LailDev, Code Starters, Production Blueprints, Tailwind CSS Templates, Microservices Guides"
         />
         <meta name="author" content="Faris Rizqilail" />
         <meta
@@ -192,11 +312,11 @@ export default function BlueprintsPage({
         <meta property="og:site_name" content="Faris Rizqilail | LailDev" />
         <meta
           property="og:title"
-          content="The Blueprint Vault · Digital Assets &amp; Code · Faris Rizqilail"
+          content="The Blueprint Vault · Digital Assets, AI Agents &amp; Code · Faris Rizqilail"
         />
         <meta
           property="og:description"
-          content="Curated codebases, AI agent skills, architecture blueprints, and advisory sessions."
+          content="Universal catalog of production-ready code starters, AI agent skills, system architecture runbooks, developer utilities, and 1-on-1 technical advisory by Faris Rizqilail."
         />
         <meta
           property="og:image"
@@ -213,15 +333,23 @@ export default function BlueprintsPage({
         <meta name="twitter:creator" content="@LailDev" />
         <meta
           name="twitter:title"
-          content="The Blueprint Vault · Faris Rizqilail"
+          content="The Blueprint Vault · Digital Assets &amp; Code · Faris Rizqilail"
         />
         <meta
           name="twitter:description"
-          content="Curated codebases, AI agent skills, architecture blueprints, and advisory sessions."
+          content="Universal catalog of production-ready code starters, AI agent skills, system architecture runbooks, developer utilities, and 1-on-1 technical advisory by Faris Rizqilail."
         />
         <meta
           name="twitter:image"
           content={`${baseUrl}/assets/images/categories/engineering.jpg`}
+        />
+
+        {/* JSON-LD Structured Data: CollectionPage + BreadcrumbList + ItemList Catalog */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schemaStructuredData),
+          }}
         />
 
         {/* Optional Gumroad Modal Script for seamless checkout */}
