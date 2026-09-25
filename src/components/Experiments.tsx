@@ -147,7 +147,8 @@ export default function Experiments() {
                   src={currentExp.image}
                   alt={currentExp.title}
                   fill
-                  priority
+                  loading="lazy"
+                  quality={80}
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   className="object-cover object-top transition-transform duration-700 group-hover:scale-103"
                 />

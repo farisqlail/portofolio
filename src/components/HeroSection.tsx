@@ -196,7 +196,8 @@ export default function HeroSection() {
                 fill
                 priority
                 className="object-cover object-top transition-transform duration-700 group-hover:scale-103"
-                sizes="(max-width: 1024px) 70vw, 35vw"
+                sizes="(max-width: 640px) 300px, (max-width: 1024px) 380px, 420px"
+                quality={85}
               />
 
               <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />

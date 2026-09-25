@@ -7,11 +7,10 @@ const ADSENSE_CLIENT_ID =
 export default function GoogleAdSenseScript() {
   const router = useRouter();
 
-  // STRICT COMPLIANCE: Never load AdSense scripts on admin backoffice, login screens, or auth flows
-  if (
-    router.pathname.startsWith("/admin") ||
-    router.pathname.startsWith("/api")
-  ) {
+  // STRICT COMPLIANCE & PERFORMANCE:
+  // 1. Never load on admin, api, or pages without ad slots (home, blueprints, lab)
+  // 2. Only load on blog routes (/blog, /blog/[slug]) where AdSlot units actually exist
+  if (!router.pathname.startsWith("/blog")) {
     return null;
   }
 
@@ -20,7 +19,7 @@ export default function GoogleAdSenseScript() {
   return (
     <Script
       id="google-adsense"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
       crossOrigin="anonymous"
     />

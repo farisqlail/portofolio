@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Head from "next/head";
+import Script from "next/script";
 import Image from "next/image";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -27,11 +28,13 @@ import type { Blueprint, BlueprintCategory } from "@/types/blueprint";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const SITE_URL =
@@ -351,10 +354,10 @@ export default function BlueprintsPage({
             __html: JSON.stringify(schemaStructuredData),
           }}
         />
-
-        {/* Optional Gumroad Modal Script for seamless checkout */}
-        <script src="https://gumroad.com/js/gumroad.js" async />
       </Head>
+
+      {/* Optional Gumroad Modal Script for seamless checkout (loaded lazily when idle) */}
+      <Script src="https://gumroad.com/js/gumroad.js" strategy="lazyOnload" />
 
       <div
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[#060608] text-foreground font-sans relative selection:bg-[#FF5500] selection:text-black`}
@@ -549,7 +552,8 @@ export default function BlueprintsPage({
                         alt={item.title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-85 group-hover:opacity-100"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 380px"
+                        quality={80}
                       />
                       {/* Dark gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-[#09090e] via-transparent to-transparent opacity-60" />

@@ -56,8 +56,8 @@ export default function AnalyticsTracker() {
         category = "AI & ML";
       }
 
-      // Defer execution so it does not block user navigation
-      setTimeout(() => {
+      // Defer execution until browser is idle so it never blocks mobile rendering or user input
+      const triggerLog = () => {
         logSiteVisit({
           path: url,
           page_type: pageType,
@@ -66,7 +66,16 @@ export default function AnalyticsTracker() {
           device,
           referrer,
         });
-      }, 500);
+      };
+
+      if ("requestIdleCallback" in window) {
+        (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(
+          triggerLog,
+          { timeout: 3000 }
+        );
+      } else {
+        setTimeout(triggerLog, 1500);
+      }
     };
 
     // Track initial load
